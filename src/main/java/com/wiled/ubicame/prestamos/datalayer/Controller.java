@@ -64,7 +64,7 @@ public class Controller {
         return q.getResultList();
     }
     
-    public List<Cliente> buscarClientePorCedula(String cedula) {
+    public List<Cliente> buscarClientePorCedula(int cedula) {
         Query q = em.createNamedQuery("Cliente.buscarCedula");
         q.setParameter("cedula", cedula);
         
@@ -78,7 +78,9 @@ public class Controller {
         return q.getResultList();
     }
     
-    public boolean aplicarPagoIntereses(Prestamo prestamo, Date fecha, final double monto, final double mora) {
+    public boolean aplicarPagoIntereses(Prestamo prestamo, Date fecha, final double monto, final double mora)  throws Exception {
+        if ((monto < 0) || (mora < 0)) throw new Exception("Valor del 'monto' o la 'mora' es menor que cero (0)") ;
+        
         //verificar si tiene intereses acumulados
         if(prestamo.getInteresAcumulado() > 0) {
             //Aplicar pago a interes acumulado
@@ -130,9 +132,9 @@ public class Controller {
         return false;
     }
     
-    public boolean saldarPrestamo(Prestamo prestamo, Date fecha, double monto) {
+    public boolean saldarPrestamo(Prestamo prestamo, Date fecha, double monto)  throws Exception {
         if(prestamo.getInteresAcumulado() > 0)
-            return false;
+            throw new Exception("El Usuario aun posee RD$" + prestamo.getInteresAcumulado() + " en intereses pendientes");
         
         Pago pago = new Pago();
         pago.setMonto(monto);
@@ -165,7 +167,9 @@ public class Controller {
         return p.getInteresAcumulado();
     }
     
-    public boolean aplicarAbonoPrestamo(Prestamo p, Date fecha, double monto) {
+    public boolean aplicarAbonoPrestamo(Prestamo p, Date fecha, double monto)  throws Exception {
+        if (monto < 0) throw new Exception("Valor del 'monto' es menor que cero (0)") ;
+        
         Abono abono = new Abono();
         abono.setMonto(monto);
         abono.setFecha(fecha);
@@ -189,7 +193,7 @@ public class Controller {
         merge(p);                
     }
     
-    public double getCuota(Prestamo p) {
+    public double getCuota(Prestamo p) throws Exception {
         double monto = p.getMonto();
         float tasa = p.getTasa();
        
@@ -206,7 +210,9 @@ public class Controller {
         return totalAbonado;
     }
     
-    public double amortizarPrestamo(final Double monto, final float tasa) {     
+    public double amortizarPrestamo(final Double monto, final float tasa)  throws Exception {     
+        if(monto < 0) throw new Exception("Valor del 'monto' es menor que cero (0)");
+        
         return (monto * tasa)/100;
     }
     
@@ -224,7 +230,9 @@ public class Controller {
         return null;
     }
     
-    public boolean crearPrestamo(Cliente cliente, String comentario, Date fecha, FormaPago formaPago, double monto, float tasa) {
+    public Prestamo crearPrestamo(Cliente cliente, String comentario, Date fecha, FormaPago formaPago, double monto, float tasa) throws Exception {
+        if(monto < 0) throw new Exception("Valor del 'monto' es menor que cero (0)");
+         
         Prestamo prestamo = new Prestamo();
         prestamo.setCliente(cliente);
         prestamo.setComentario(comentario);
@@ -236,7 +244,7 @@ public class Controller {
         persist(prestamo);
         
         if(prestamo.getId() != null)
-            return true;
-        return false;
+            return prestamo;
+        return null;
     }
 }
