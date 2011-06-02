@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 public class PersistenceUnitTest extends TestCase {
     
    private static final Logger logger = Logger.getLogger(PersistenceUnitTest.class.getName());
-
+   
     private EntityManagerFactory emFactory;
     private EntityManager em;
 
@@ -75,7 +75,7 @@ public class PersistenceUnitTest extends TestCase {
         String apellido = "Garcia";
         int cedula = 00116600107;
         String telefono = "8095958378";
-        Controller instance = Controller.getInstance();
+        Controller instance = Controller.getInstance("prestamosPU");
         cliente = instance.crearCliente(nombre, apellido, cedula, telefono);
         
         assertNotNull(cliente);
@@ -88,7 +88,7 @@ public class PersistenceUnitTest extends TestCase {
         FormaPago formaPago = FormaPago.MENSUAL;
         double monto = 10000.0;
         float tasa = 5.0F;
-        Controller instance = Controller.getInstance();
+        Controller instance = Controller.getInstance("prestamosPU");
         boolean expResult = true;
         boolean result = instance.crearPrestamo(cliente, comentario, fecha, formaPago, monto, tasa);
         assertEquals(expResult, result);

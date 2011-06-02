@@ -25,14 +25,14 @@ public class Controller {
     private EntityManager em;
     private static Controller controller;
     
-    private Controller() {
-        emf = Persistence.createEntityManagerFactory("prestamosPU");
+    private Controller(String persistenceUnit) {
+        emf = Persistence.createEntityManagerFactory(persistenceUnit);
         em = emf.createEntityManager();
     }
     
-    public static Controller getInstance() {
+    public static Controller getInstance(String persistenceUnit) {
         if(controller == null) {
-            controller = new Controller();
+            controller = new Controller(persistenceUnit);
         } 
         
         return controller;

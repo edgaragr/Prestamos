@@ -10,6 +10,7 @@
  */
 package com.wiled.ubicame.prestamos.forms;
 
+import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import javax.swing.JOptionPane;
@@ -144,7 +145,7 @@ public class CrearClientes extends javax.swing.JDialog {
 
     private void crearBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crearBtnActionPerformed
         // TODO add your handling code here:
-        Controller controller = Controller.getInstance();
+        Controller controller = Controller.getInstance(PrestamoConstants.PROD_PU);
         String nombre = nombreTxt.getText();
         String apellido = apellidoTxt.getText();
         int cedula = Integer.valueOf(cedulaTxt.getValue().toString());

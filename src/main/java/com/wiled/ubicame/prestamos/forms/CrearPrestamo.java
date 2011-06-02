@@ -10,6 +10,7 @@
  */
 package com.wiled.ubicame.prestamos.forms;
 
+import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.FormaPago;
@@ -169,7 +170,7 @@ public class CrearPrestamo extends javax.swing.JDialog {
 
     private void crearBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crearBtnActionPerformed
         // TODO add your handling code here:
-        Controller controller = Controller.getInstance();
+        Controller controller = Controller.getInstance(PrestamoConstants.PROD_PU);
         if(clienteCombo.getSelectedIndex() == -1) {
             JOptionPane.showMessageDialog(rootPane, "Por favor seleccione un cliente", "ERROR", JOptionPane.ERROR_MESSAGE);
             return;
