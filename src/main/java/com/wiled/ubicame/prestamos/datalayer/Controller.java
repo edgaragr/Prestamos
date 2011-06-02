@@ -4,6 +4,7 @@
  */
 package com.wiled.ubicame.prestamos.datalayer;
 
+import com.wiled.ubicame.prestamo.utils.PrestamoException;
 import com.wiled.ubicame.prestamos.entidades.Abono;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.FormaPago;
@@ -78,8 +79,8 @@ public class Controller {
         return q.getResultList();
     }
     
-    public boolean aplicarPagoIntereses(Prestamo prestamo, Date fecha, final double monto, final double mora)  throws Exception {
-        if ((monto < 0) || (mora < 0)) throw new Exception("Valor del 'monto' o la 'mora' es menor que cero (0)") ;
+    public boolean aplicarPagoIntereses(Prestamo prestamo, Date fecha, final double monto, final double mora)  throws PrestamoException {
+        if ((monto < 0) || (mora < 0)) throw new PrestamoException("Valor del 'monto' o la 'mora' es menor que cero (0)") ;
         
         //verificar si tiene intereses acumulados
         if(prestamo.getInteresAcumulado() > 0) {
@@ -132,9 +133,9 @@ public class Controller {
         return false;
     }
     
-    public boolean saldarPrestamo(Prestamo prestamo, Date fecha, double monto)  throws Exception {
+    public boolean saldarPrestamo(Prestamo prestamo, Date fecha, double monto)  throws PrestamoException {
         if(prestamo.getInteresAcumulado() > 0)
-            throw new Exception("El Usuario aun posee RD$" + prestamo.getInteresAcumulado() + " en intereses pendientes");
+            throw new PrestamoException("El Usuario aun posee RD$" + prestamo.getInteresAcumulado() + " en intereses pendientes");
         
         Pago pago = new Pago();
         pago.setMonto(monto);
@@ -167,8 +168,8 @@ public class Controller {
         return p.getInteresAcumulado();
     }
     
-    public boolean aplicarAbonoPrestamo(Prestamo p, Date fecha, double monto)  throws Exception {
-        if (monto < 0) throw new Exception("Valor del 'monto' es menor que cero (0)") ;
+    public boolean aplicarAbonoPrestamo(Prestamo p, Date fecha, double monto)  throws PrestamoException {
+        if (monto < 0) throw new PrestamoException("Valor del 'monto' es menor que cero (0)") ;
         
         Abono abono = new Abono();
         abono.setMonto(monto);
@@ -210,8 +211,8 @@ public class Controller {
         return totalAbonado;
     }
     
-    public double amortizarPrestamo(final Double monto, final float tasa)  throws Exception {     
-        if(monto < 0) throw new Exception("Valor del 'monto' es menor que cero (0)");
+    public double amortizarPrestamo(final Double monto, final float tasa)  throws PrestamoException {     
+        if(monto < 0) throw new PrestamoException("Valor del 'monto' es menor que cero (0)");
         
         return (monto * tasa)/100;
     }
@@ -230,8 +231,8 @@ public class Controller {
         return null;
     }
     
-    public Prestamo crearPrestamo(Cliente cliente, String comentario, Date fecha, FormaPago formaPago, double monto, float tasa) throws Exception {
-        if(monto < 0) throw new Exception("Valor del 'monto' es menor que cero (0)");
+    public Prestamo crearPrestamo(Cliente cliente, String comentario, Date fecha, FormaPago formaPago, double monto, float tasa) throws PrestamoException {
+        if(monto < 0) throw new PrestamoException("Valor del 'monto' es menor que cero (0)");
          
         Prestamo prestamo = new Prestamo();
         prestamo.setCliente(cliente);
