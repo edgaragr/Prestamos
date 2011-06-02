@@ -4,16 +4,13 @@
  */
 package com.wiled.ubicame.prestamos.datalayer;
 
+import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.FormaPago;
-import java.sql.Connection;
-import java.sql.DriverManager;
+import com.wiled.ubicame.prestamos.entidades.Prestamo;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Logger;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import junit.framework.TestCase;
 
 /**
@@ -21,14 +18,16 @@ import junit.framework.TestCase;
  * @author edgar
  */
 public class PersistenceUnitTest extends TestCase {
-    
-   private static final Logger logger = Logger.getLogger(PersistenceUnitTest.class.getName());
-   
-    private EntityManagerFactory emFactory;
-    private EntityManager em;
 
-    private Connection connection;
-    private Cliente cliente;
+    private static final Logger logger = Logger.getLogger(PersistenceUnitTest.class.getName());
+    private static Cliente cliente;
+    private static Prestamo prestamo;
+    private static Controller instance;
+    
+    private String nombre = "Edgar";
+    private String apellido =  "Garcia";
+    private int cedula = 00116600107;
+    private String telefono = "8095958378";
     
     public PersistenceUnitTest(String testName) {
         super(testName);
@@ -40,63 +39,102 @@ public class PersistenceUnitTest extends TestCase {
         try {
             logger.info("Starting in-memory HSQL database for unit tests");
             Class.forName("org.hsqldb.jdbcDriver");
-            connection = DriverManager.getConnection("jdbc:hsqldb:mem:unit-testing-jpa", "sa", "");
         } catch (Exception ex) {
-            fail("Exception during HSQL database startup.");
+            fail("Exception during HSQL database startup\n" + ex.getLocalizedMessage());
         }
         try {
             logger.info("Building JPA EntityManager for unit tests");
-            emFactory = Persistence.createEntityManagerFactory("testPU");
-            em = emFactory.createEntityManager();
+            instance = Controller.getInstance(PrestamoConstants.TEST_PU) ;
         } catch (Exception ex) {
-            fail("Exception during JPA EntityManager instanciation.");
+            fail("Exception during JPA EntityManager instanciation\n" + ex.getLocalizedMessage());
         }
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        logger.info("Shuting down Hibernate JPA layer.");
-        if (em != null) {
-            em.close();
-        }
-        if (emFactory != null) {
-            emFactory.close();
-        }
-        logger.info("Stopping in-memory HSQL database.");
-        try {
-            connection.createStatement().execute("SHUTDOWN");
-        } catch (Exception ex) {}
     }
 
     public void testCrearCliente() {
         logger.info("crearCliente");
-        String nombre = "Edgar";
-        String apellido = "Garcia";
-        int cedula = 00116600107;
-        String telefono = "8095958378";
-        Controller instance = Controller.getInstance("prestamosPU");
         cliente = instance.crearCliente(nombre, apellido, cedula, telefono);
-        
+
         assertNotNull(cliente);
     }
-    
-    public void testCrearPrestamo() {
+
+    public void testCrearPrestamo() throws Exception {
         logger.info("crearPrestamo");
         String comentario = "Comentario de prueba";
         Date fecha = getDate();
         FormaPago formaPago = FormaPago.MENSUAL;
         double monto = 10000.0;
         float tasa = 5.0F;
-        Controller instance = Controller.getInstance("prestamosPU");
-        boolean expResult = true;
-        boolean result = instance.crearPrestamo(cliente, comentario, fecha, formaPago, monto, tasa);
+
+        System.out.println("*****************************"+cliente.getCedula());
+        prestamo = instance.crearPrestamo(cliente, comentario, fecha, formaPago, monto, tasa);
+        assertNotNull(prestamo);
+    }
+
+    public void testGetCuota() throws Exception {
+        double expResult = 0;
+        double cuota = instance.getCuota(prestamo);
+        
+        assertEquals(expResult, cuota);
+    }
+    
+    public void testGetInteresesPendientes() {
+        double expResult = 0;
+        double intereses = instance.getInteresesPendientes(prestamo);
+        
+        assertEquals(expResult, intereses);
+    }
+    
+    public void testAmortizarPrestamo() throws Exception {
+        logger.info("amortizarPrestamo");
+        double expResult = 100;
+        double result = instance.amortizarPrestamo(new Double(1000), 10);
         assertEquals(expResult, result);
+    }
+    
+    public void testAplicarAbonoPrestamo() throws Exception {
+        logger.info("aplicarAbonoPrestamo");
+        instance.aplicarAbonoPrestamo(prestamo, getDate(), 100);
+    }
+    
+    public void testAplicarPagoIntereses() throws Exception {
+        instance.aplicarPagoIntereses(prestamo, getDate(), 300, 50);
+    }
+    
+    public void testBuscarClienteApellido() {
+        Cliente result = instance.buscarClientePorApellido(apellido).get(0);
+        assertEquals(cliente, result);
+    }
+    
+    public void testBuscarClienteNombre() {
+        Cliente result = instance.buscarClientePorNombre(nombre).get(0);
+        assertEquals(cliente, result);
+    }
+    
+    public void testBuscarClienteTelefono() {
+        Cliente result = instance.buscarClientePorTelefono(telefono).get(0);
+        assertEquals(cliente, result);
+    }
+    
+    public void testBuscarClienteCedula() {
+        Cliente result = instance.buscarClientePorCedula(cedula).get(0);
+        assertEquals(cliente, result);
+    }
+    
+    public void testGetCapitalAdeudado() {
+        double expResult = 0;
+        double capitalAdeudado = instance.getCapitalAdeudado(prestamo);
+        
+        assertEquals(expResult, capitalAdeudado);
+    }
+    
+    public void testSaldarPrestamo() throws Exception {
+        double capitalAdeudado = instance.getCapitalAdeudado(prestamo);        
+        instance.saldarPrestamo(prestamo, getDate(), capitalAdeudado);
     }
     
     private Date getDate() {
         Calendar c = Calendar.getInstance();
-        
+
         return c.getTime();
     }
 }
