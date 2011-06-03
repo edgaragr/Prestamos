@@ -23,7 +23,8 @@ import javax.persistence.OneToMany;
     @NamedQuery(name="Cliente.buscarNombre", query="Select c from Cliente c where c.nombre = :nombre"),
     @NamedQuery(name="Cliente.buscarApellido", query="Select c from Cliente c where c.apellido = :apellido"),
     @NamedQuery(name="Cliente.buscarCedula", query="Select c from Cliente c where c.cedula = :cedula"),
-    @NamedQuery(name="Cliente.buscarTelefono", query="Select c from Cliente c where c.telefono = :telefono")
+    @NamedQuery(name="Cliente.buscarTelefono", query="Select c from Cliente c where c.telefono = :telefono"),
+    @NamedQuery(name="Cliente.getAll", query="Select c from Cliente c")
 })
 public class Cliente implements Serializable {
     private static final long serialVersionUID = 1L;
