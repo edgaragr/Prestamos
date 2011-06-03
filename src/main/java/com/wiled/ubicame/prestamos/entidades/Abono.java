@@ -18,7 +18,7 @@ import javax.persistence.Temporal;
  * @author edgar
  */
 @Entity
-public class Abono implements Serializable {
+public class Abono implements Serializable, Pago {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -30,6 +30,7 @@ public class Abono implements Serializable {
     @ManyToOne
     private Prestamo prestamo;
 
+    @Override
     public Date getFecha() {
         return fecha;
     }
@@ -46,6 +47,7 @@ public class Abono implements Serializable {
         this.prestamo = prestamo;
     }
         
+    @Override
     public double getMonto() {
         return monto;
     }
@@ -85,6 +87,16 @@ public class Abono implements Serializable {
     @Override
     public String toString() {
         return "com.wiled.ubicame.prestamos.entidades.Abono[ id=" + id + " ]";
+    }
+
+    @Override
+    public double getMora() {
+        return 0;
+    }
+
+    @Override
+    public String getTipoPago() {
+        return TipoPago.ABONO.getTipoPago();
     }
     
 }
