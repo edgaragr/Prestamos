@@ -62,7 +62,6 @@ public class Application extends javax.swing.JFrame {
         crearPrestamo = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         crearCliente = new javax.swing.JMenuItem();
-        actualizarCliente = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         amortizarPrestamo = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
@@ -135,14 +134,6 @@ public class Application extends javax.swing.JFrame {
         });
         jMenu4.add(crearCliente);
 
-        actualizarCliente.setText("Actualizar o Eliminar");
-        actualizarCliente.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                actualizarClienteActionPerformed(evt);
-            }
-        });
-        jMenu4.add(actualizarCliente);
-
         jMenuBar1.add(jMenu4);
 
         jMenu3.setText("Utilidades");
@@ -210,13 +201,6 @@ public class Application extends javax.swing.JFrame {
         form.setLocationRelativeTo(null);
         form.setVisible(true);
     }//GEN-LAST:event_crearClienteActionPerformed
-
-    private void actualizarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actualizarClienteActionPerformed
-        // TODO add your handling code here:
-        AdministrarCliente form = new AdministrarCliente(this, true);
-        form.setLocationRelativeTo(null);
-        form.setVisible(true);
-    }//GEN-LAST:event_actualizarClienteActionPerformed
 
     private void amortizarPrestamoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amortizarPrestamoActionPerformed
         // TODO add your handling code here:
@@ -365,7 +349,6 @@ public class Application extends javax.swing.JFrame {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenuItem actualizarCliente;
     private javax.swing.JMenuItem amortizarPrestamo;
     private javax.swing.JButton buscarBtn;
     private javax.swing.JMenuItem crearCliente;
