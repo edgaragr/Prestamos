@@ -29,7 +29,14 @@ public class Application extends javax.swing.JFrame {
     public Application() {
         initComponents();
         controller = Controller.getInstance(PrestamoConstants.PROD_PU);
-        resultTable.setModel(new ResultTableModel(null));
+        resultTable.setModel(new ResultTableModel());       
+        
+        criterioBusquedaCombo.insertItemAt(CriterioBusqueda.CEDULA, 0);
+        criterioBusquedaCombo.insertItemAt(CriterioBusqueda.TELEFONO, 1);
+        criterioBusquedaCombo.insertItemAt(CriterioBusqueda.NOMBRE, 2);
+        criterioBusquedaCombo.insertItemAt(CriterioBusqueda.APELLIDO, 3);
+        
+        criterioBusquedaCombo.setSelectedIndex(0);
     }
 
     /** This method is called from within the constructor to
@@ -50,10 +57,9 @@ public class Application extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        menuSalir = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         crearPrestamo = new javax.swing.JMenuItem();
-        realizarPago = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         crearCliente = new javax.swing.JMenuItem();
         actualizarCliente = new javax.swing.JMenuItem();
@@ -66,8 +72,6 @@ public class Application extends javax.swing.JFrame {
         setResizable(false);
 
         jLabel1.setText("Criterio de Busqueda:");
-
-        criterioBusquedaCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         buscarBtn.setBackground(java.awt.Color.green);
         buscarBtn.setText("Buscar");
@@ -98,8 +102,13 @@ public class Application extends javax.swing.JFrame {
         jMenuItem1.setText("Realizar Backup");
         jMenu1.add(jMenuItem1);
 
-        jMenuItem2.setText("Salir");
-        jMenu1.add(jMenuItem2);
+        menuSalir.setText("Salir");
+        menuSalir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuSalirActionPerformed(evt);
+            }
+        });
+        jMenu1.add(menuSalir);
 
         jMenuBar1.add(jMenu1);
 
@@ -113,14 +122,6 @@ public class Application extends javax.swing.JFrame {
             }
         });
         jMenu2.add(crearPrestamo);
-
-        realizarPago.setText("Pagos y Abonos");
-        realizarPago.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                realizarPagoActionPerformed(evt);
-            }
-        });
-        jMenu2.add(realizarPago);
 
         jMenuBar1.add(jMenu2);
 
@@ -190,7 +191,7 @@ public class Application extends javax.swing.JFrame {
                     .addComponent(buscarBtn))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 428, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(108, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -202,13 +203,6 @@ public class Application extends javax.swing.JFrame {
         form.setLocationRelativeTo(null);
         form.setVisible(true);
     }//GEN-LAST:event_crearPrestamoActionPerformed
-
-    private void realizarPagoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_realizarPagoActionPerformed
-        // TODO add your handling code here:
-        PagoForm form = new PagoForm(this, true);
-        form.setLocationRelativeTo(null);
-        form.setVisible(true);
-    }//GEN-LAST:event_realizarPagoActionPerformed
 
     private void crearClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crearClienteActionPerformed
         // TODO add your handling code here:
@@ -237,26 +231,61 @@ public class Application extends javax.swing.JFrame {
         String valorDeBusqueda = valorBusquedaTxt.getText();
         
         if(valorDeBusqueda.isEmpty()) {
-            JOptionPane.showMessageDialog(crearCliente, "Introduzca un valor de busqueda", "ERROR", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Introduzca un valor de busqueda", "ERROR", JOptionPane.ERROR_MESSAGE);
         } else {
-                List<Cliente> listaClientes= null;
+            List<Cliente> listaClientes= null;
         
             switch(criterioBusqueda) {
                 case APELLIDO:
                     listaClientes = controller.buscarClientePorApellido(valorDeBusqueda);
                     break;
                 case CEDULA:
-                    listaClientes = controller.buscarClientePorCedula(Integer.valueOf(valorDeBusqueda));
+                    if(containsOnlyNumbers(valorDeBusqueda) && isCedulaSizeValid(valorDeBusqueda)) {
+                        listaClientes = controller.buscarClientePorCedula(Integer.valueOf(valorDeBusqueda));
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Introduzca un numero de cedula valido", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     break;
                 case NOMBRE:
                     listaClientes = controller.buscarClientePorApellido(valorDeBusqueda);
                     break;
                 case TELEFONO:
+                    if(containsOnlyNumbers(valorDeBusqueda) && isTelefonoSizeValid(valorDeBusqueda)) {
+                        listaClientes = controller.buscarClientePorTelefono(valorDeBusqueda);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Introduzca un numero de telefono valido", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     listaClientes = controller.buscarClientePorTelefono(valorDeBusqueda);
-                    break;                
+                    break;
+                default:
+                    listaClientes = new ArrayList<Cliente>();
+            }
+            
+            if(!listaClientes.isEmpty()) {
+                ((ResultTableModel) resultTable.getModel()).clientes.addAll(listaClientes);
+                resultTable.updateUI();
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontraron clientes", "BUSQUEDA", JOptionPane.INFORMATION_MESSAGE);;
             }
         }
     }//GEN-LAST:event_buscarBtnActionPerformed
+
+    private boolean isCedulaSizeValid(String cedula) {
+        if(cedula.length() == 11) return true;
+        return false;
+    }
+    
+    private boolean isTelefonoSizeValid(String telefono) {
+        if(telefono.length() == 10) return true;
+        return false;
+    }
+    
+    private void menuSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSalirActionPerformed
+        // TODO add your handling code here:
+        dispose();
+    }//GEN-LAST:event_menuSalirActionPerformed
 
     /**
      * @param args the command line arguments
@@ -320,6 +349,21 @@ public class Application extends javax.swing.JFrame {
         }
     }
     
+    public boolean containsOnlyNumbers(String str) {
+        if (str == null || str.length() == 0)
+            return false;
+        
+        //Replace '-'
+        str = str.replaceAll("-", "");
+        
+        for (int i = 0; i < str.length(); i++) {
+            if (!Character.isDigit(str.charAt(i)))
+                return false;
+        }
+        
+        return true;
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem actualizarCliente;
     private javax.swing.JMenuItem amortizarPrestamo;
@@ -335,9 +379,8 @@ public class Application extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JMenuItem realizarPago;
+    private javax.swing.JMenuItem menuSalir;
     private javax.swing.JTable resultTable;
     private javax.swing.JTextField valorBusquedaTxt;
     // End of variables declaration//GEN-END:variables
