@@ -51,6 +51,12 @@ public class Controller {
         em.getTransaction().commit();
     }
     
+    public void remove(Object obj) throws Exception {
+        em.getTransaction().begin();
+        em.remove(obj);
+        em.getTransaction().commit();
+    }
+    
     public List<Cliente> buscarClientePorNombre(String nombre) {
         Query q = em.createNamedQuery("Cliente.buscarNombre");
         q.setParameter("nombre", nombre);
@@ -131,6 +137,11 @@ public class Controller {
         }
         
         return false;
+    }
+    
+    public List<Cliente> getClientes() {
+        Query q = em.createNamedQuery("Cliente.getAll");
+        return q.getResultList();
     }
     
     public boolean saldarPrestamo(Prestamo prestamo, Date fecha, double monto)  throws PrestamoException {
