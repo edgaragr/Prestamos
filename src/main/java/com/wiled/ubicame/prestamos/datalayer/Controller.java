@@ -8,7 +8,7 @@ import com.wiled.ubicame.prestamo.utils.PrestamoException;
 import com.wiled.ubicame.prestamos.entidades.Abono;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.FormaPago;
-import com.wiled.ubicame.prestamos.entidades.Pago;
+import com.wiled.ubicame.prestamos.entidades.PagoInteres;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
 import java.util.Date;
 import java.util.List;
@@ -91,7 +91,7 @@ public class Controller {
             if(restante < 0) {
                 prestamo.setInteresAcumulado(0);
                 
-                Pago pago = new Pago();
+                PagoInteres pago = new PagoInteres();
                 pago.setMonto(Math.abs(restante));
                 pago.setMora(0);
                 pago.setPrestamo(prestamo);
@@ -116,7 +116,7 @@ public class Controller {
             }
         } else if (prestamo.getInteresAcumulado() == 0){
             //Aplicar un pago normal
-            Pago pago = new Pago();
+            PagoInteres pago = new PagoInteres();
             pago.setMonto(monto);
             pago.setMora(0);
             pago.setPrestamo(prestamo);
@@ -137,7 +137,7 @@ public class Controller {
         if(prestamo.getInteresAcumulado() > 0)
             throw new PrestamoException("El Usuario aun posee RD$" + prestamo.getInteresAcumulado() + " en intereses pendientes");
         
-        Pago pago = new Pago();
+        PagoInteres pago = new PagoInteres();
         pago.setMonto(monto);
         pago.setMora(0);
         pago.setPrestamo(prestamo);
@@ -201,7 +201,7 @@ public class Controller {
         return amortizarPrestamo(monto, tasa);
     }
     
-    private double getTotalAbonado(List<Abono> abonos) {
+    public static double getTotalAbonado(List<Abono> abonos) {
         double totalAbonado = 0;
         
         for (Abono abono : abonos) {
