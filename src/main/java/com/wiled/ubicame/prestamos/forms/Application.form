@@ -125,7 +125,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="criterioBusquedaCombo" min="-2" pref="157" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="criterioTxt" min="-2" pref="348" max="-2" attributes="0"/>
+                      <Component id="valorBusquedaTxt" min="-2" pref="348" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="buscarBtn" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -141,7 +141,7 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="criterioBusquedaCombo" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="criterioTxt" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="valorBusquedaTxt" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="buscarBtn" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -169,7 +169,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="criterioTxt">
+    <Component class="javax.swing.JTextField" name="valorBusquedaTxt">
     </Component>
     <Component class="javax.swing.JButton" name="buscarBtn">
       <Properties>

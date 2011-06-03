@@ -11,9 +11,11 @@
 package com.wiled.ubicame.prestamos.forms;
 
 import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
+import com.wiled.ubicame.prestamo.utils.PrestamoException;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.FormaPago;
+import com.wiled.ubicame.prestamos.entidades.Prestamo;
 import java.util.Calendar;
 import java.util.Date;
 import javax.swing.JOptionPane;
@@ -116,10 +118,13 @@ public class CrearPrestamo extends javax.swing.JDialog {
                                     .addComponent(jLabel3)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                     .addComponent(tasaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
                                     .addComponent(fechaDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(formaPagoCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                    .addComponent(jLabel4)
+                                    .addGap(53, 53, 53)))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(formaPagoCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel5)
                     .addComponent(jLabel6)
                     .addGroup(layout.createSequentialGroup()
@@ -181,15 +186,20 @@ public class CrearPrestamo extends javax.swing.JDialog {
         Date fecha = fechaDatePicker.getDate();
         FormaPago formaPago = (FormaPago) formaPagoCombo.getSelectedItem();
         double monto = Double.valueOf(montoTxt.getText());
-        float tasa = Float.valueOf(tasaTxt.getText());
-        
-        boolean creado = controller.crearPrestamo(cliente, comentario, fecha, formaPago, monto, tasa);
-        if(creado == Boolean.TRUE) {
-            JOptionPane.showMessageDialog(rootPane, "Prestamo creado con exito", "Informacion", JOptionPane.INFORMATION_MESSAGE);
-            limpiarCampos();
-        } else {
-            JOptionPane.showMessageDialog(rootPane, "El prestamo no pudo ser creado", "ERROR", JOptionPane.ERROR_MESSAGE);
-        } 
+        float tasa = Float.valueOf(tasaTxt.getText());        
+
+        try {
+            Prestamo creado  = controller.crearPrestamo(cliente, comentario, fecha, formaPago, monto, tasa);
+            
+            if(creado != null) {
+                JOptionPane.showMessageDialog(rootPane, "Prestamo creado con exito", "Informacion", JOptionPane.INFORMATION_MESSAGE);
+                limpiarCampos();
+            } else {
+                JOptionPane.showMessageDialog(rootPane, "El prestamo no pudo ser creado", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }            
+        } catch (PrestamoException ex) {
+            JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }         
     }//GEN-LAST:event_crearBtnActionPerformed
 
     private void limpiarCampos() {

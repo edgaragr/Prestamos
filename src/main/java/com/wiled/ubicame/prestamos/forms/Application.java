@@ -10,7 +10,14 @@
  */
 package com.wiled.ubicame.prestamos.forms;
 
+import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
+import com.wiled.ubicame.prestamos.datalayer.Controller;
+import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.CriterioBusqueda;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.table.AbstractTableModel;
 
 /**
  *
@@ -21,6 +28,8 @@ public class Application extends javax.swing.JFrame {
     /** Creates new form Application */
     public Application() {
         initComponents();
+        controller = Controller.getInstance(PrestamoConstants.PROD_PU);
+        resultTable.setModel(new ResultTableModel(null));
     }
 
     /** This method is called from within the constructor to
@@ -34,7 +43,7 @@ public class Application extends javax.swing.JFrame {
 
         jLabel1 = new javax.swing.JLabel();
         criterioBusquedaCombo = new javax.swing.JComboBox();
-        criterioTxt = new javax.swing.JTextField();
+        valorBusquedaTxt = new javax.swing.JTextField();
         buscarBtn = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         resultTable = new javax.swing.JTable();
@@ -165,7 +174,7 @@ public class Application extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(criterioBusquedaCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(criterioTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 348, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(valorBusquedaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 348, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(buscarBtn)))
                 .addContainerGap())
@@ -177,7 +186,7 @@ public class Application extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(criterioBusquedaCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(criterioTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(valorBusquedaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(buscarBtn))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 428, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -225,16 +234,27 @@ public class Application extends javax.swing.JFrame {
     private void buscarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarBtnActionPerformed
         //Obtener criterio de busqueda
         CriterioBusqueda criterioBusqueda = (CriterioBusqueda) criterioBusquedaCombo.getSelectedItem();
-        switch(criterioBusqueda) {
-            case APELLIDO:
-                break;
-            case CEDULA:
-                break;
-            case NOMBRE:
-                break;
-            case TELEFONO:
-                break;
-                
+        String valorDeBusqueda = valorBusquedaTxt.getText();
+        
+        if(valorDeBusqueda.isEmpty()) {
+            JOptionPane.showMessageDialog(crearCliente, "Introduzca un valor de busqueda", "ERROR", JOptionPane.ERROR_MESSAGE);
+        } else {
+                List<Cliente> listaClientes= null;
+        
+            switch(criterioBusqueda) {
+                case APELLIDO:
+                    listaClientes = controller.buscarClientePorApellido(valorDeBusqueda);
+                    break;
+                case CEDULA:
+                    listaClientes = controller.buscarClientePorCedula(Integer.valueOf(valorDeBusqueda));
+                    break;
+                case NOMBRE:
+                    listaClientes = controller.buscarClientePorApellido(valorDeBusqueda);
+                    break;
+                case TELEFONO:
+                    listaClientes = controller.buscarClientePorTelefono(valorDeBusqueda);
+                    break;                
+            }
         }
     }//GEN-LAST:event_buscarBtnActionPerformed
 
@@ -244,6 +264,7 @@ public class Application extends javax.swing.JFrame {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 Application a = new Application();
                 a.setLocationRelativeTo(null);
@@ -251,6 +272,54 @@ public class Application extends javax.swing.JFrame {
             }
         });
     }
+    
+    private class ResultTableModel extends AbstractTableModel {
+        List<Cliente> clientes;
+        String[] columns = {"Nombre", "Telefono", "Cedula"};
+
+        public ResultTableModel() {
+            clientes = new ArrayList<Cliente>();
+        }
+                
+        public ResultTableModel(List<Cliente> clientes) {
+            this.clientes = clientes;
+        }
+                        
+        @Override
+        public int getRowCount() {
+            return clientes.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return columns.length;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            return columns[column];
+        }
+        
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            String valueAt = null;
+            
+            switch(columnIndex) {
+                case 1:
+                    valueAt =  clientes.get(rowIndex).getNombre() + " " + clientes.get(rowIndex).getApellido();
+                    break;
+                case 2:
+                    valueAt = clientes.get(rowIndex).getTelefono();
+                    break;
+                case 3:
+                    valueAt =  String.valueOf(clientes.get(rowIndex).getCedula());
+                    break;
+            }
+            
+            return valueAt;
+        }
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem actualizarCliente;
     private javax.swing.JMenuItem amortizarPrestamo;
@@ -258,7 +327,6 @@ public class Application extends javax.swing.JFrame {
     private javax.swing.JMenuItem crearCliente;
     private javax.swing.JMenuItem crearPrestamo;
     private javax.swing.JComboBox criterioBusquedaCombo;
-    private javax.swing.JTextField criterioTxt;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
@@ -271,5 +339,7 @@ public class Application extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JMenuItem realizarPago;
     private javax.swing.JTable resultTable;
+    private javax.swing.JTextField valorBusquedaTxt;
     // End of variables declaration//GEN-END:variables
+    private Controller controller;
 }
