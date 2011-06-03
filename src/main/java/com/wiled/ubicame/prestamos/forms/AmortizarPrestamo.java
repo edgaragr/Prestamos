@@ -102,7 +102,7 @@ public class AmortizarPrestamo extends javax.swing.JDialog {
         float tasa = Float.valueOf(tasaTxt.getText());
         try {
             double resultado = controller.amortizarPrestamo(monto, tasa);
-            JOptionPane.showMessageDialog(rootPane, "Cuotas de: RD$" + resultado + " mensuales.", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(rootPane, "Cuotas de: RD$" + resultado + " pesos..", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
         } catch (PrestamoException ex) {
             JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
         }
