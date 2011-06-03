@@ -107,7 +107,7 @@ public class Cliente implements Serializable {
 
     @Override
     public String toString() {
-        return "com.wiled.ubicame.prestamos.entidades.Cliente[ id=" + id + " ]";
+        return (nombre + " " + apellido).toUpperCase();
     }
     
 }
