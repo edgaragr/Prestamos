@@ -8,9 +8,10 @@
     <class>com.wiled.ubicame.prestamos.entidades.PagoInteres</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/prestamos"/>
-      <property name="javax.persistence.jdbc.password" value="edgaragr"/>
+      <property name="javax.persistence.jdbc.password" value="wiled"/>
       <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
       <property name="javax.persistence.jdbc.user" value="root"/>
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
     </properties>
   </persistence-unit>
   <persistence-unit name="testPU" transaction-type="RESOURCE_LOCAL">

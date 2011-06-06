@@ -42,13 +42,19 @@ public class Controller {
     public void persist(Object obj) {
         em.getTransaction().begin();
         em.persist(obj);
-        em.getTransaction().commit();
+        em.flush();
+        em.getTransaction().commit();   
     }
     
     public void merge(Object obj) {
         em.getTransaction().begin();
         em.merge(obj);
+        em.flush();
         em.getTransaction().commit();
+    }
+    
+    public void refresh(Object obj) {
+        em.refresh(obj);
     }
     
     public void remove(Object obj) throws Exception {
@@ -71,7 +77,7 @@ public class Controller {
         return q.getResultList();
     }
     
-    public List<Cliente> buscarClientePorCedula(int cedula) {
+    public List<Cliente> buscarClientePorCedula(String cedula) {
         Query q = em.createNamedQuery("Cliente.buscarCedula");
         q.setParameter("cedula", cedula);
         
@@ -228,7 +234,7 @@ public class Controller {
         return (monto * tasa)/100;
     }
     
-    public Cliente crearCliente(String nombre, String apellido, int cedula, String telefono) {
+    public Cliente crearCliente(String nombre, String apellido, String cedula, String telefono) {
         Cliente cliente = new Cliente();
         cliente.setNombre(nombre);
         cliente.setApellido(apellido);

@@ -5,6 +5,7 @@
 package com.wiled.ubicame.prestamos.entidades;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,8 +21,8 @@ import javax.persistence.OneToMany;
  */
 @Entity
 @NamedQueries({
-    @NamedQuery(name="Cliente.buscarNombre", query="Select c from Cliente c where c.nombre = :nombre"),
-    @NamedQuery(name="Cliente.buscarApellido", query="Select c from Cliente c where c.apellido = :apellido"),
+    @NamedQuery(name="Cliente.buscarNombre", query="Select c from Cliente c where c.nombre like :nombre"),
+    @NamedQuery(name="Cliente.buscarApellido", query="Select c from Cliente c where c.apellido like :apellido"),
     @NamedQuery(name="Cliente.buscarCedula", query="Select c from Cliente c where c.cedula = :cedula"),
     @NamedQuery(name="Cliente.buscarTelefono", query="Select c from Cliente c where c.telefono = :telefono"),
     @NamedQuery(name="Cliente.getAll", query="Select c from Cliente c")
@@ -33,11 +34,16 @@ public class Cliente implements Serializable {
     private Long id;
     private String nombre;
     private String apellido;
-    private int cedula;
+    private String cedula;
     private String telefono;
     @OneToMany(mappedBy = "cliente")
     private List<Prestamo> prestamos;
 
+    public Cliente() {
+        prestamos = new ArrayList<Prestamo>();
+    }
+
+    
     public List<Prestamo> getPrestamos() {
         return prestamos;
     }
@@ -54,11 +60,11 @@ public class Cliente implements Serializable {
         this.apellido = apellido;
     }
 
-    public int getCedula() {
+    public String getCedula() {
         return cedula;
     }
 
-    public void setCedula(int cedula) {
+    public void setCedula(String cedula) {
         this.cedula = cedula;
     }
 

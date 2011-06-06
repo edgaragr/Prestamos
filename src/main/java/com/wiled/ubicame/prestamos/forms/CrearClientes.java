@@ -13,6 +13,7 @@ package com.wiled.ubicame.prestamos.forms;
 import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
+import java.awt.Frame;
 import javax.swing.JOptionPane;
 
 /**
@@ -20,11 +21,22 @@ import javax.swing.JOptionPane;
  * @author edgar
  */
 public class CrearClientes extends javax.swing.JDialog {
+    private Frame frame;
+    private Cliente clienteCreado;
 
+    public Cliente getClienteCreado() {
+        return clienteCreado;
+    }
+
+    public void setClienteCreado(Cliente clienteCreado) {
+        this.clienteCreado = clienteCreado;
+    }
+    
     /** Creates new form CrearClientes */
     public CrearClientes(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.frame = parent;
     }
 
     /** This method is called from within the constructor to
@@ -41,12 +53,12 @@ public class CrearClientes extends javax.swing.JDialog {
         jLabel2 = new javax.swing.JLabel();
         apellidoTxt = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        cedulaTxt = new javax.swing.JFormattedTextField();
         jLabel4 = new javax.swing.JLabel();
-        telefonoTxt = new javax.swing.JFormattedTextField();
         crearBtn = new javax.swing.JButton();
         cancelarBtn = new javax.swing.JButton();
         limpiarCamposBtn = new javax.swing.JButton();
+        cedulaTxt = new javax.swing.JTextField();
+        telefonoTxt = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Creacion de Clientes");
@@ -92,7 +104,7 @@ public class CrearClientes extends javax.swing.JDialog {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(jLabel1)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(nombreTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(layout.createSequentialGroup()
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -104,7 +116,7 @@ public class CrearClientes extends javax.swing.JDialog {
                                 .addComponent(apellidoTxt)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addComponent(telefonoTxt, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(cedulaTxt, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)))))
+                                    .addComponent(cedulaTxt, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)))))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(crearBtn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -129,15 +141,15 @@ public class CrearClientes extends javax.swing.JDialog {
                     .addComponent(jLabel3)
                     .addComponent(cedulaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
                     .addComponent(telefonoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(crearBtn)
                     .addComponent(cancelarBtn)
                     .addComponent(limpiarCamposBtn))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
 
         pack();
@@ -148,13 +160,15 @@ public class CrearClientes extends javax.swing.JDialog {
         Controller controller = Controller.getInstance(PrestamoConstants.PROD_PU);
         String nombre = nombreTxt.getText();
         String apellido = apellidoTxt.getText();
-        int cedula = Integer.valueOf(cedulaTxt.getValue().toString());
-        String telefono = telefonoTxt.getValue().toString();
+        String cedula = cedulaTxt.getText().toString();
+        String telefono = telefonoTxt.getText().toString();
         
         Cliente cliente = controller.crearCliente(nombre, apellido, cedula, telefono);
         if(cliente != null) {
             JOptionPane.showMessageDialog(rootPane, "Cliente creado con exito", "Informacion", JOptionPane.INFORMATION_MESSAGE);
-            limpiarCampos();
+            clienteCreado = cliente;
+            
+            dispose();            
         } else {
             JOptionPane.showMessageDialog(rootPane, "Cliente no pudo ser creado", "ERROR", JOptionPane.ERROR_MESSAGE);
         }        
@@ -182,7 +196,7 @@ public class CrearClientes extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField apellidoTxt;
     private javax.swing.JButton cancelarBtn;
-    private javax.swing.JFormattedTextField cedulaTxt;
+    private javax.swing.JTextField cedulaTxt;
     private javax.swing.JButton crearBtn;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -190,6 +204,6 @@ public class CrearClientes extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JButton limpiarCamposBtn;
     private javax.swing.JTextField nombreTxt;
-    private javax.swing.JFormattedTextField telefonoTxt;
+    private javax.swing.JTextField telefonoTxt;
     // End of variables declaration//GEN-END:variables
 }

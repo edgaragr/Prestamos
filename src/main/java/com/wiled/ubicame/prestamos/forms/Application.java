@@ -14,8 +14,13 @@ import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.CriterioBusqueda;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
@@ -24,12 +29,63 @@ import javax.swing.table.AbstractTableModel;
  * @author edgar
  */
 public class Application extends javax.swing.JFrame {
-
+    private JFrame getJFrame() {
+        return this;
+    }
+    
     /** Creates new form Application */
     public Application() {
         initComponents();
         controller = Controller.getInstance(PrestamoConstants.PROD_PU);
         resultTable.setModel(new ResultTableModel());       
+        resultTable.addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(e.getClickCount() > 1) {
+                    int rowNum = resultTable.getSelectedRow();
+                    Cliente cliente = ((ResultTableModel) resultTable.getModel()).clientes.get(rowNum);
+                    controller.refresh(cliente);
+                    
+                    if(cliente.getPrestamos().isEmpty()) {
+                        JOptionPane.showMessageDialog(getJFrame(), "Este cliente no posee prestamos", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        PagoForm form = new PagoForm(getJFrame(), true, cliente);
+                        form.setVisible(true);
+                    }                    
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                
+            }
+        });
+        
+        valorBusquedaTxt.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    onBuscar();
+                }                
+            }            
+        });
         
         criterioBusquedaCombo.insertItemAt(CriterioBusqueda.CEDULA, 0);
         criterioBusquedaCombo.insertItemAt(CriterioBusqueda.TELEFONO, 1);
@@ -58,8 +114,6 @@ public class Application extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         menuSalir = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
-        crearPrestamo = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         crearCliente = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
@@ -110,19 +164,6 @@ public class Application extends javax.swing.JFrame {
         jMenu1.add(menuSalir);
 
         jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("Prestamos");
-
-        crearPrestamo.setText("Crear");
-        crearPrestamo.setToolTipText("Crear Prestamos");
-        crearPrestamo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                crearPrestamoActionPerformed(evt);
-            }
-        });
-        jMenu2.add(crearPrestamo);
-
-        jMenuBar1.add(jMenu2);
 
         jMenu4.setText("Clientes");
 
@@ -188,18 +229,20 @@ public class Application extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void crearPrestamoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crearPrestamoActionPerformed
-        // TODO add your handling code here:
-        CrearPrestamo form = new CrearPrestamo(this, true);
-        form.setLocationRelativeTo(null);
-        form.setVisible(true);
-    }//GEN-LAST:event_crearPrestamoActionPerformed
-
     private void crearClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crearClienteActionPerformed
         // TODO add your handling code here:
         CrearClientes form = new CrearClientes(this, true);
         form.setLocationRelativeTo(null);
         form.setVisible(true);
+        
+        if(form.getClienteCreado() != null) {
+            Cliente cliente = form.getClienteCreado();
+            
+            CrearPrestamo crearPrestamoForm = new CrearPrestamo(null, true, cliente);
+            crearPrestamoForm.setVisible(true);
+            
+            
+        }
     }//GEN-LAST:event_crearClienteActionPerformed
 
     private void amortizarPrestamoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amortizarPrestamoActionPerformed
@@ -210,7 +253,11 @@ public class Application extends javax.swing.JFrame {
     }//GEN-LAST:event_amortizarPrestamoActionPerformed
 
     private void buscarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarBtnActionPerformed
-        //Obtener criterio de busqueda
+        onBuscar();
+    }//GEN-LAST:event_buscarBtnActionPerformed
+
+    private void onBuscar() {
+            //Obtener criterio de busqueda
         CriterioBusqueda criterioBusqueda = (CriterioBusqueda) criterioBusquedaCombo.getSelectedItem();
         String valorDeBusqueda = valorBusquedaTxt.getText();
         
@@ -221,18 +268,18 @@ public class Application extends javax.swing.JFrame {
         
             switch(criterioBusqueda) {
                 case APELLIDO:
-                    listaClientes = controller.buscarClientePorApellido(valorDeBusqueda);
+                    listaClientes = controller.buscarClientePorApellido("%"+valorDeBusqueda+"%");
                     break;
                 case CEDULA:
                     if(containsOnlyNumbers(valorDeBusqueda) && isCedulaSizeValid(valorDeBusqueda)) {
-                        listaClientes = controller.buscarClientePorCedula(Integer.valueOf(valorDeBusqueda));
+                        listaClientes = controller.buscarClientePorCedula(valorDeBusqueda);
                     } else {
                         JOptionPane.showMessageDialog(this, "Introduzca un numero de cedula valido", "ERROR", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     break;
                 case NOMBRE:
-                    listaClientes = controller.buscarClientePorApellido(valorDeBusqueda);
+                    listaClientes = controller.buscarClientePorApellido("%"+valorDeBusqueda+"%");
                     break;
                 case TELEFONO:
                     if(containsOnlyNumbers(valorDeBusqueda) && isTelefonoSizeValid(valorDeBusqueda)) {
@@ -251,11 +298,11 @@ public class Application extends javax.swing.JFrame {
                 ((ResultTableModel) resultTable.getModel()).clientes.addAll(listaClientes);
                 resultTable.updateUI();
             } else {
-                JOptionPane.showMessageDialog(this, "No se encontraron clientes", "BUSQUEDA", JOptionPane.INFORMATION_MESSAGE);;
+                JOptionPane.showMessageDialog(this, "No se encontraron clientes", "BUSQUEDA", JOptionPane.INFORMATION_MESSAGE);
             }
         }
-    }//GEN-LAST:event_buscarBtnActionPerformed
-
+    }
+    
     private boolean isCedulaSizeValid(String cedula) {
         if(cedula.length() == 11) return true;
         return false;
@@ -318,13 +365,13 @@ public class Application extends javax.swing.JFrame {
             String valueAt = null;
             
             switch(columnIndex) {
-                case 1:
+                case 0:
                     valueAt =  clientes.get(rowIndex).getNombre() + " " + clientes.get(rowIndex).getApellido();
                     break;
-                case 2:
+                case 1:
                     valueAt = clientes.get(rowIndex).getTelefono();
                     break;
-                case 3:
+                case 2:
                     valueAt =  String.valueOf(clientes.get(rowIndex).getCedula());
                     break;
             }
@@ -352,11 +399,9 @@ public class Application extends javax.swing.JFrame {
     private javax.swing.JMenuItem amortizarPrestamo;
     private javax.swing.JButton buscarBtn;
     private javax.swing.JMenuItem crearCliente;
-    private javax.swing.JMenuItem crearPrestamo;
     private javax.swing.JComboBox criterioBusquedaCombo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;

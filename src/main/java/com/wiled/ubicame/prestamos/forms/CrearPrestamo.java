@@ -16,7 +16,6 @@ import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.FormaPago;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
-import java.util.Calendar;
 import java.util.Date;
 import javax.swing.JOptionPane;
 
@@ -26,10 +25,19 @@ import javax.swing.JOptionPane;
  */
 public class CrearPrestamo extends javax.swing.JDialog {
 
+    private Cliente cliente;
     /** Creates new form CrearPrestamo */
-    public CrearPrestamo(java.awt.Frame parent, boolean modal) {
+    public CrearPrestamo(java.awt.Frame parent, boolean modal, Cliente cliente) {
         super(parent, modal);
         initComponents();
+        this.cliente = cliente;
+        
+        nombreLbl.setText(cliente.toString());
+        
+        formaPagoCombo.insertItemAt(FormaPago.DIARIO, 0);
+        formaPagoCombo.insertItemAt(FormaPago.MENSUAL, 1);
+        formaPagoCombo.insertItemAt(FormaPago.QUINCENAL, 2);
+        formaPagoCombo.insertItemAt(FormaPago.SEMANAL, 3);
     }
 
     /** This method is called from within the constructor to
@@ -42,7 +50,6 @@ public class CrearPrestamo extends javax.swing.JDialog {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        clienteCombo = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
         montoTxt = new javax.swing.JFormattedTextField();
         jLabel3 = new javax.swing.JLabel();
@@ -56,6 +63,7 @@ public class CrearPrestamo extends javax.swing.JDialog {
         cancelarBtn = new javax.swing.JButton();
         tasaTxt = new javax.swing.JTextField();
         fechaDatePicker = new org.jdesktop.swingx.JXDatePicker();
+        nombreLbl = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Crear Prestamo");
@@ -63,15 +71,11 @@ public class CrearPrestamo extends javax.swing.JDialog {
 
         jLabel1.setText("Cliente:");
 
-        clienteCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
         jLabel2.setText("Monto:");
 
         jLabel3.setText("Tasa:");
 
         jLabel4.setText("Forma Pago:");
-
-        formaPagoCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel5.setText("Fecha:");
 
@@ -96,6 +100,8 @@ public class CrearPrestamo extends javax.swing.JDialog {
             }
         });
 
+        nombreLbl.setText("[NOMBRE]");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -109,18 +115,19 @@ public class CrearPrestamo extends javax.swing.JDialog {
                             .addComponent(jLabel2)
                             .addComponent(jLabel1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(clienteCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(fechaDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(53, 53, 53))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(nombreLbl, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                     .addComponent(montoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                     .addComponent(jLabel3)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(tasaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(fechaDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(53, 53, 53)))))
+                                    .addComponent(tasaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(66, 66, 66))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -139,7 +146,7 @@ public class CrearPrestamo extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(clienteCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(nombreLbl))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
@@ -158,7 +165,7 @@ public class CrearPrestamo extends javax.swing.JDialog {
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(crearBtn)
                     .addComponent(cancelarBtn))
@@ -176,12 +183,7 @@ public class CrearPrestamo extends javax.swing.JDialog {
     private void crearBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crearBtnActionPerformed
         // TODO add your handling code here:
         Controller controller = Controller.getInstance(PrestamoConstants.PROD_PU);
-        if(clienteCombo.getSelectedIndex() == -1) {
-            JOptionPane.showMessageDialog(rootPane, "Por favor seleccione un cliente", "ERROR", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        Cliente cliente = (Cliente) clienteCombo.getSelectedItem();
+
         String comentario = comentarioTxt.getText();
         Date fecha = fechaDatePicker.getDate();
         FormaPago formaPago = (FormaPago) formaPagoCombo.getSelectedItem();
@@ -193,7 +195,7 @@ public class CrearPrestamo extends javax.swing.JDialog {
             
             if(creado != null) {
                 JOptionPane.showMessageDialog(rootPane, "Prestamo creado con exito", "Informacion", JOptionPane.INFORMATION_MESSAGE);
-                limpiarCampos();
+                dispose();
             } else {
                 JOptionPane.showMessageDialog(rootPane, "El prestamo no pudo ser creado", "ERROR", JOptionPane.ERROR_MESSAGE);
             }            
@@ -201,23 +203,9 @@ public class CrearPrestamo extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
         }         
     }//GEN-LAST:event_crearBtnActionPerformed
-
-    private void limpiarCampos() {
-        clienteCombo.setSelectedIndex(-1);
-        comentarioTxt.setText("");
-        
-        Calendar c = Calendar.getInstance();
-        fechaDatePicker.setDate(c.getTime());
-        formaPagoCombo.setSelectedIndex(-1);
-        montoTxt.setText("");
-        tasaTxt.setText("");
-        
-        clienteCombo.grabFocus();
-    }
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelarBtn;
-    private javax.swing.JComboBox clienteCombo;
     private javax.swing.JTextArea comentarioTxt;
     private javax.swing.JButton crearBtn;
     private org.jdesktop.swingx.JXDatePicker fechaDatePicker;
@@ -230,6 +218,7 @@ public class CrearPrestamo extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JFormattedTextField montoTxt;
+    private javax.swing.JLabel nombreLbl;
     private javax.swing.JTextField tasaTxt;
     // End of variables declaration//GEN-END:variables
 }

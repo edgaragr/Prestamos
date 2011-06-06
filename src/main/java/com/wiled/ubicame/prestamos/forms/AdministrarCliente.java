@@ -28,6 +28,8 @@ public class AdministrarCliente extends javax.swing.JDialog {
         controller = Controller.getInstance(PrestamoConstants.PROD_PU);        
         this.cliente = cliente;
         
+        controller.refresh(cliente);
+        
         nombreTxt.setText(cliente.getNombre());
         apellidoTxt.setText(cliente.getApellido());
         cedulaTxt.setText(String.valueOf(cliente.getCedula()));
@@ -170,7 +172,7 @@ public class AdministrarCliente extends javax.swing.JDialog {
     private void actualizarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actualizarBtnActionPerformed
         cliente.setNombre(nombreTxt.getText());
         cliente.setApellido(apellidoTxt.getText());
-        cliente.setCedula(Integer.valueOf(cedulaTxt.getText()));
+        cliente.setCedula(cedulaTxt.getText());
         cliente.setTelefono(telefonoTxt.getText());
         
         controller.merge(cliente);

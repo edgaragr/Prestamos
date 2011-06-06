@@ -30,7 +30,7 @@
                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="nombreTxt" min="-2" pref="193" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
@@ -44,7 +44,7 @@
                               <Component id="apellidoTxt" alignment="0" max="32767" attributes="0"/>
                               <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
                                   <Component id="telefonoTxt" alignment="0" max="32767" attributes="1"/>
-                                  <Component id="cedulaTxt" alignment="0" pref="103" max="32767" attributes="1"/>
+                                  <Component id="cedulaTxt" alignment="0" pref="127" max="32767" attributes="1"/>
                               </Group>
                           </Group>
                       </Group>
@@ -80,17 +80,17 @@
                   <Component id="cedulaTxt" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="telefonoTxt" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                  <Component id="telefonoTxt" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="crearBtn" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="cancelarBtn" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="limpiarCamposBtn" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace pref="24" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -115,14 +115,10 @@
         <Property name="text" type="java.lang.String" value="Cedula:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JFormattedTextField" name="cedulaTxt">
-    </Component>
     <Component class="javax.swing.JLabel" name="jLabel4">
       <Properties>
         <Property name="text" type="java.lang.String" value="Telefono:"/>
       </Properties>
-    </Component>
-    <Component class="javax.swing.JFormattedTextField" name="telefonoTxt">
     </Component>
     <Component class="javax.swing.JButton" name="crearBtn">
       <Properties>
@@ -150,6 +146,10 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="limpiarCamposBtnActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JTextField" name="cedulaTxt">
+    </Component>
+    <Component class="javax.swing.JTextField" name="telefonoTxt">
     </Component>
   </SubComponents>
 </Form>

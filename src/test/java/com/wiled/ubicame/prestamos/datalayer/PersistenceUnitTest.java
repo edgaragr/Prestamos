@@ -26,7 +26,7 @@ public class PersistenceUnitTest extends TestCase {
     
     private String nombre = "Edgar";
     private String apellido =  "Garcia";
-    private int cedula = 00116600107;
+    private String cedula = "00116600107";
     private String telefono = "8095958378";
     
     public PersistenceUnitTest(String testName) {
