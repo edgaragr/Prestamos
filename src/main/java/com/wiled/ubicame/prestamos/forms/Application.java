@@ -10,11 +10,6 @@
  */
 package com.wiled.ubicame.prestamos.forms;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.impl.StdSchedulerFactory;
 import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Cliente;

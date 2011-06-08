@@ -26,8 +26,6 @@ import java.awt.event.KeyEvent;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.containsOnlyNumbers;
@@ -54,7 +52,7 @@ public class PagoForm extends javax.swing.JDialog {
         initComponents();
         this.cliente = cliente;
         jFrame = parent;
-
+        
         controller = Controller.getInstance(PrestamoConstants.PROD_PU);
         tipoPagoCBox.insertItemAt(TipoPago.ABONO, 0);
         tipoPagoCBox.insertItemAt(TipoPago.PAGO_INTERES, 1);
@@ -65,6 +63,8 @@ public class PagoForm extends javax.swing.JDialog {
         int totalPrestamos = cliente.getPrestamos().size();
         prestamo = cliente.getPrestamos().get(totalPrestamos - 1);
 
+        controller.refresh(prestamo);
+        
         montoTxt.setText(String.valueOf(prestamo.getMonto()));
         montoTxt.setEditable(false);
 
@@ -99,17 +99,16 @@ public class PagoForm extends javax.swing.JDialog {
                     Pago pago = ((PagosTableModel) pagosTable.getModel()).pagos.get(pagosTable.getSelectedRow());
                     ((PagosTableModel) pagosTable.getModel()).pagos.remove(pagosTable.getSelectedRow());
                     pagosTable.updateUI();
-                    
+
                     if( pago instanceof Abono) {
                         prestamo.getAbonos().remove((Abono) pago);
+                        prestamo.setMonto(prestamo.getMonto() + pago.getMonto());
                         controller.merge(prestamo);
-                        controller.renegociarPrestamo(prestamo);
                     } else if ( pago instanceof PagoInteres) {
                         prestamo.getPagos().remove((PagoInteres) pago);
                         controller.merge(prestamo);
-                        controller.renegociarPrestamo(prestamo);
                     }
-
+                    
                     List<Pago> pagos = new ArrayList<Pago>();
                     pagos.addAll(prestamo.getAbonos());
                     pagos.addAll(prestamo.getPagos());

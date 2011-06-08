@@ -49,7 +49,7 @@ public class Controller {
     public void merge(Object obj) {
         em.getTransaction().begin();
         em.merge(obj);
-        em.flush();
+        //em.flush();
         em.getTransaction().commit();
     }
     
@@ -204,9 +204,13 @@ public class Controller {
     }
     
     public void renegociarPrestamo(Prestamo p) {
-        refresh(p);
+        refresh(p);                
+        double ultimoAbono = 0;
         
-        double ultimoAbono = p.getAbonos().get(p.getAbonos().size() - 1).getMonto();
+        if(!p.getAbonos().isEmpty()) {
+            ultimoAbono = p.getAbonos().get(p.getAbonos().size() - 1).getMonto();
+        }
+       
         double montoPrestado = p.getMonto();
         double nuevoBalance = montoPrestado - ultimoAbono;
         
