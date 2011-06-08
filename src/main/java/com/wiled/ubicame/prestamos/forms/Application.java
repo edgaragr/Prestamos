@@ -23,6 +23,9 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
+import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.containsOnlyNumbers;
+import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.isCedulaSizeValid;
+import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.isTelefonoSizeValid;
 
 /**
  *
@@ -51,6 +54,7 @@ public class Application extends javax.swing.JFrame {
                         JOptionPane.showMessageDialog(getJFrame(), "Este cliente no posee prestamos", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         PagoForm form = new PagoForm(getJFrame(), true, cliente);
+                        form.setLocationRelativeTo(null);
                         form.setVisible(true);
                     }                    
                 }
@@ -241,6 +245,7 @@ public class Application extends javax.swing.JFrame {
             Cliente cliente = form.getClienteCreado();
             
             CrearPrestamo crearPrestamoForm = new CrearPrestamo(null, true, cliente);
+            crearPrestamoForm.setLocationRelativeTo(null);
             crearPrestamoForm.setVisible(true);
             
             
@@ -305,17 +310,7 @@ public class Application extends javax.swing.JFrame {
             }
         }
     }
-    
-    private boolean isCedulaSizeValid(String cedula) {
-        if(cedula.length() == 11) return true;
-        return false;
-    }
-    
-    private boolean isTelefonoSizeValid(String telefono) {
-        if(telefono.length() == 10) return true;
-        return false;
-    }
-    
+        
     private void menuSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSalirActionPerformed
         // TODO add your handling code here:
         dispose();
@@ -382,22 +377,7 @@ public class Application extends javax.swing.JFrame {
             return valueAt;
         }
     }
-    
-    public boolean containsOnlyNumbers(String str) {
-        if (str == null || str.length() == 0)
-            return false;
         
-        //Replace '-'
-        str = str.replaceAll("-", "");
-        
-        for (int i = 0; i < str.length(); i++) {
-            if (!Character.isDigit(str.charAt(i)))
-                return false;
-        }
-        
-        return true;
-    }
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem amortizarPrestamo;
     private javax.swing.JButton buscarBtn;
