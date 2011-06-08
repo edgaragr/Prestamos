@@ -17,6 +17,9 @@ import java.awt.Frame;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
+import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.containsOnlyNumbers;
+import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.isCedulaSizeValid;
+import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.isTelefonoSizeValid;
 
 /**
  *
@@ -114,29 +117,25 @@ public class CrearClientes extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(nombreTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel2)
-                                .addComponent(jLabel3)
-                                .addComponent(jLabel4))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(apellidoTxt)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(telefonoTxt, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(cedulaTxt, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)))))
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(nombreTxt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
+                            .addComponent(apellidoTxt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
+                            .addComponent(cedulaTxt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
+                            .addComponent(telefonoTxt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(crearBtn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cancelarBtn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(limpiarCamposBtn)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -172,7 +171,32 @@ public class CrearClientes extends javax.swing.JDialog {
        onCreate();
     }//GEN-LAST:event_crearBtnActionPerformed
 
+    
     private void onCreate() {
+        if(nombreTxt.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(rootPane, "Por favor introduzca un nombre", "ERROR", JOptionPane.ERROR_MESSAGE);
+            nombreTxt.grabFocus();
+            return;
+        }
+        
+        if(apellidoTxt.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(rootPane, "Por favor introduzca un apellido", "ERROR", JOptionPane.ERROR_MESSAGE);
+            apellidoTxt.grabFocus();
+            return;
+        }
+        
+        if(cedulaTxt.getText().isEmpty() || !containsOnlyNumbers(cedulaTxt.getText()) || isCedulaSizeValid(cedulaTxt.getText())) {
+            JOptionPane.showMessageDialog(rootPane, "Por favor introduzca una cedula valida", "ERROR", JOptionPane.ERROR_MESSAGE);
+            cedulaTxt.grabFocus();
+            return;            
+        }
+        
+        if(telefonoTxt.getText().isEmpty() || !containsOnlyNumbers(telefonoTxt.getText()) || isTelefonoSizeValid(telefonoTxt.getText())) {
+            JOptionPane.showMessageDialog(rootPane, "Por favor introduzca un telefono valida", "ERROR", JOptionPane.ERROR_MESSAGE);
+            telefonoTxt.grabFocus();
+            return;            
+        }
+        
         // TODO add your handling code here:
         Controller controller = Controller.getInstance(PrestamoConstants.PROD_PU);
         String nombre = nombreTxt.getText();
