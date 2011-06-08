@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
+import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.containsOnlyNumbers;
 
 /**
  *
@@ -424,8 +425,8 @@ public class PagoForm extends javax.swing.JDialog {
 
     private void aplicarPagoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aplicarPagoBtnActionPerformed
         // TODO add your handling code here:
-        if (montoPagoTxt.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(jFrame, "Por favor digite un monto", "ERROR APLICANDO PAGO", JOptionPane.ERROR_MESSAGE);
+        if (montoPagoTxt.getText().isEmpty() || !containsOnlyNumbers(montoPagoTxt.getText())) {
+            JOptionPane.showMessageDialog(jFrame, "Por favor digite un monto", "ERROR DE VALIDACION", JOptionPane.ERROR_MESSAGE);
             montoPagoTxt.grabFocus();
             montoPagoTxt.setBackground(Color.red);
             montoPagoTxt.setForeground(Color.WHITE);
@@ -433,7 +434,7 @@ public class PagoForm extends javax.swing.JDialog {
         }
         
         if (datePicker.getDate() == null) {
-            JOptionPane.showMessageDialog(jFrame, "Por favor digite una fecha", "ERROR APLICANDO PAGO", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(jFrame, "Por favor digite una fecha", "ERROR DE VALIDACION", JOptionPane.ERROR_MESSAGE);
             datePicker.grabFocus();
             datePicker.setBackground(Color.red);
             datePicker.setForeground(Color.WHITE);
@@ -441,18 +442,24 @@ public class PagoForm extends javax.swing.JDialog {
         }
 
         if (tipoPagoCBox.getSelectedItem() == null) {
-            JOptionPane.showMessageDialog(jFrame, "Por elija una opcion de pago", "ERROR APLICANDO PAGO", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(jFrame, "Por elija una opcion de pago", "ERROR DE VALIDACION", JOptionPane.ERROR_MESSAGE);
             tipoPagoCBox.grabFocus();
             return;
         }
         
         boolean pagoAplicado = false;
         if (tipoPagoCBox.getSelectedItem().equals(TipoPago.PAGO_INTERES)) {
+             if (moraPagoTxt.getText().isEmpty() || !containsOnlyNumbers(moraPagoTxt.getText())) {       
+                 JOptionPane.showMessageDialog(jFrame, "Por favor digite un valor numerico en el campo 'Mora'", "ERROR DE VALIDACION", JOptionPane.ERROR_MESSAGE);
+                 moraPagoTxt.grabFocus();
+                 return;
+             }
+            
             try {
                 pagoAplicado = controller.aplicarPagoIntereses(prestamo,
                         datePicker.getDate(),
-                        Double.valueOf(montoPagoTxt.getText().isEmpty() ? "O" : montoPagoTxt.getText()),
-                        Double.valueOf(moraPagoTxt.getText().isEmpty() ? "0" : moraPagoTxt.getText()));
+                        Double.valueOf(montoPagoTxt.getText()),
+                        Double.valueOf(moraPagoTxt.getText()));
             } catch (PrestamoException ex) {
                 JOptionPane.showMessageDialog(jFrame, ex.getMessage(), "ERROR APLICANDO PAGO", JOptionPane.ERROR_MESSAGE);
             }
