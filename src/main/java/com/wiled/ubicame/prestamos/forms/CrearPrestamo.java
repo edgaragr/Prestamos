@@ -18,7 +18,7 @@ import com.wiled.ubicame.prestamos.entidades.FormaPago;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
 import java.util.Date;
 import javax.swing.JOptionPane;
-
+import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.containsOnlyNumbers;
 /**
  *
  * @author edgar
@@ -182,6 +182,30 @@ public class CrearPrestamo extends javax.swing.JDialog {
 
     private void crearBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crearBtnActionPerformed
         // TODO add your handling code here:
+        if(montoTxt.getText().isEmpty() || !containsOnlyNumbers(montoTxt.getText()) || Double.valueOf(montoTxt.getText()) < 0) {
+            JOptionPane.showMessageDialog(rootPane, "Digite un monto correcto", "ERROR", JOptionPane.ERROR_MESSAGE);
+            montoTxt.grabFocus();
+            return;
+        }
+        
+        if(tasaTxt.getText().isEmpty() || !containsOnlyNumbers(tasaTxt.getText()) || Float.valueOf(tasaTxt.getText()) < 0.0f) {
+            JOptionPane.showMessageDialog(rootPane, "Digite una tasa correcto", "ERROR", JOptionPane.ERROR_MESSAGE);
+            tasaTxt.grabFocus();
+            return;
+        }
+        
+        if(formaPagoCombo.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(rootPane, "Elija una forma de pago", "ERROR", JOptionPane.ERROR_MESSAGE);
+            formaPagoCombo.grabFocus();
+            return;
+        }
+        
+        if(fechaDatePicker.getDate() == null) {
+            JOptionPane.showMessageDialog(rootPane, "Elija una fecha valida", "ERROR", JOptionPane.ERROR_MESSAGE);
+            fechaDatePicker.grabFocus();
+            return;
+        }
+                
         Controller controller = Controller.getInstance(PrestamoConstants.PROD_PU);
 
         String comentario = comentarioTxt.getText();
