@@ -62,7 +62,7 @@ public class PagoForm extends javax.swing.JDialog {
         montoTxt.setText(String.valueOf(prestamo.getMonto()));
         montoTxt.setEditable(false);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         fechaTxt.setText(sdf.format(prestamo.getFecha()));
         tasaTxt.setText(String.valueOf(prestamo.getTasa()));
         tasaTxt.setEditable(false);
@@ -137,7 +137,7 @@ public class PagoForm extends javax.swing.JDialog {
                     value = pagos.get(rowIndex).getMora();
                     break;
                 case 3:
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                     value = sdf.format(pagos.get(rowIndex).getFecha());
                     break;
             }
