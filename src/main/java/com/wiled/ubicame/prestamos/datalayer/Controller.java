@@ -134,6 +134,8 @@ public class Controller {
             pago.setPrestamo(prestamo);
             pago.setFecha(fecha);
     
+            persist(pago);
+            
             prestamo.getPagos().add(pago);
             merge(prestamo);
 
@@ -198,13 +200,15 @@ public class Controller {
         merge(p);
         
         renegociarPrestamo(p);
-        return false;
+        return true;
     }
     
     private void renegociarPrestamo(Prestamo p) {
-        double totalAbonado = getTotalAbonado(p.getAbonos());
+        refresh(p);
+        
+        double ultimoAbono = p.getAbonos().get(p.getAbonos().size() - 1).getMonto();
         double montoPrestado = p.getMonto();
-        double nuevoBalance = montoPrestado - totalAbonado;
+        double nuevoBalance = montoPrestado - ultimoAbono;
         
         p.setMonto(nuevoBalance);
         

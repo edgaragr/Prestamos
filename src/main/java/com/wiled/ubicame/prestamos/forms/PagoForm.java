@@ -10,15 +10,19 @@
  */
 package com.wiled.ubicame.prestamos.forms;
 
+import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
+import com.wiled.ubicame.prestamo.utils.PrestamoException;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.Pago;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
 import com.wiled.ubicame.prestamos.entidades.TipoPago;
+import java.awt.Color;
 import java.awt.Frame;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -26,8 +30,11 @@ import javax.swing.table.AbstractTableModel;
  * @author edgar
  */
 public class PagoForm extends javax.swing.JDialog {
+
     private Frame jFrame;
-    
+    private Prestamo prestamo;
+    private Controller controller;
+
     /** Creates new form PagoForm */
     public PagoForm(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -39,32 +46,34 @@ public class PagoForm extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         this.cliente = cliente;
-                
+        jFrame = parent;
+
+        controller = Controller.getInstance(PrestamoConstants.PROD_PU);
         tipoPagoCBox.insertItemAt(TipoPago.ABONO, 0);
         tipoPagoCBox.insertItemAt(TipoPago.PAGO_INTERES, 1);
-        
+
         nameLabel.setVisible(true);
         nameLabel.setText(cliente.toString());
-        
+
         int totalPrestamos = cliente.getPrestamos().size();
-        Prestamo prestamo = cliente.getPrestamos().get(totalPrestamos - 1);
-        
+        prestamo = cliente.getPrestamos().get(totalPrestamos - 1);
+
         montoTxt.setText(String.valueOf(prestamo.getMonto()));
         montoTxt.setEditable(false);
-        
+
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         fechaTxt.setText(sdf.format(prestamo.getFecha()));
         tasaTxt.setText(String.valueOf(prestamo.getTasa()));
         tasaTxt.setEditable(false);
-        
+
         formaPagoCBox.insertItemAt(prestamo.getFormaPago(), 0);
         formaPagoCBox.setSelectedIndex(0);
         formaPagoCBox.setEditable(false);
-        
+
         interesesTxt.setText(String.valueOf(prestamo.getInteresAcumulado()));
         interesesTxt.setEditable(false);
-        
-        
+
+
         double totalAbonado = Controller.getTotalAbonado(prestamo.getAbonos());
         abonadoTxt.setText(String.valueOf(totalAbonado));
         abonadoTxt.setEditable(false);
@@ -72,15 +81,16 @@ public class PagoForm extends javax.swing.JDialog {
         List<Pago> pagos = new ArrayList<Pago>();
         pagos.addAll(prestamo.getAbonos());
         pagos.addAll(prestamo.getPagos());
-        
+
         pagosTable.setModel(new PagosTableModel(pagos));
         pagosTable.updateUI();
     }
 
     private class PagosTableModel extends AbstractTableModel {
+
         List<Pago> pagos = null;
         String[] columns = {"Tipo Pago", "Monto", "Mora", "Fecha"};
-        
+
         public PagosTableModel() {
             pagos = new ArrayList<Pago>();
         }
@@ -88,12 +98,12 @@ public class PagoForm extends javax.swing.JDialog {
         public PagosTableModel(List<Pago> pagos) {
             this.pagos = pagos;
         }
-        
+
         @Override
         public String getColumnName(int column) {
             return columns[column];
         }
-                        
+
         @Override
         public int getRowCount() {
             return pagos.size();
@@ -107,26 +117,26 @@ public class PagoForm extends javax.swing.JDialog {
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             Object value = null;
-            switch(columnIndex) {
-                case 1:
+            switch (columnIndex) {
+                case 0:
                     value = pagos.get(rowIndex).getTipoPago();
                     break;
-                case 2:
-                        value =  pagos.get(rowIndex).getMonto();
+                case 1:
+                    value = pagos.get(rowIndex).getMonto();
                     break;
-                case 3:
+                case 2:
                     value = pagos.get(rowIndex).getMora();
                     break;
-                case 4:
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm");                    
+                case 3:
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm");
                     value = sdf.format(pagos.get(rowIndex).getFecha());
                     break;
             }
-            
+
             return value;
-        }        
+        }
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -195,6 +205,11 @@ public class PagoForm extends javax.swing.JDialog {
 
         aplicarPagoBtn.setBackground(new java.awt.Color(197, 164, 15));
         aplicarPagoBtn.setText("Aplicar Pago");
+        aplicarPagoBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aplicarPagoBtnActionPerformed(evt);
+            }
+        });
 
         jLabel10.setText("Fecha:");
 
@@ -258,7 +273,7 @@ public class PagoForm extends javax.swing.JDialog {
 
         tasaTxt.setEditable(false);
 
-        nameLabel.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        nameLabel.setFont(new java.awt.Font("Tahoma", 1, 11));
         nameLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         nameLabel.setText("[Nombre del Cliente]");
 
@@ -357,6 +372,78 @@ public class PagoForm extends javax.swing.JDialog {
         adm.setVisible(true);
     }//GEN-LAST:event_administrarClienteBtnActionPerformed
 
+    private void reloadPagoTable() {
+        controller.refresh(prestamo);
+
+        List<Pago> pagos = new ArrayList<Pago>();
+        pagos.addAll(prestamo.getAbonos());
+        pagos.addAll(prestamo.getPagos());
+
+        PagosTableModel tableModel = (PagosTableModel) pagosTable.getModel();
+        tableModel.pagos.clear();
+        tableModel.pagos.addAll(pagos);
+
+        pagosTable.updateUI();
+        montoTxt.setText(String.valueOf(prestamo.getMonto()));
+
+        double totalAbonado = Controller.getTotalAbonado(prestamo.getAbonos());
+        abonadoTxt.setText(String.valueOf(totalAbonado));
+
+        montoTxt.updateUI();
+        abonadoTxt.updateUI();
+        
+        moraPagoTxt.setText("");
+        montoPagoTxt.setText("");
+        
+        montoPagoTxt.grabFocus();
+    }
+
+    private void aplicarPagoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aplicarPagoBtnActionPerformed
+        // TODO add your handling code here:
+        if (montoPagoTxt.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(jFrame, "Por favor digite un monto", "ERROR APLICANDO PAGO", JOptionPane.ERROR_MESSAGE);
+            montoPagoTxt.grabFocus();
+            montoPagoTxt.setBackground(Color.red);
+            montoPagoTxt.setForeground(Color.WHITE);
+            return;
+        }
+        
+        if (datePicker.getDate() == null) {
+            JOptionPane.showMessageDialog(jFrame, "Por favor digite una fecha", "ERROR APLICANDO PAGO", JOptionPane.ERROR_MESSAGE);
+            datePicker.grabFocus();
+            datePicker.setBackground(Color.red);
+            datePicker.setForeground(Color.WHITE);
+            return;
+        }
+
+        if (tipoPagoCBox.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(jFrame, "Por elija una opcion de pago", "ERROR APLICANDO PAGO", JOptionPane.ERROR_MESSAGE);
+            tipoPagoCBox.grabFocus();
+            return;
+        }
+        
+        boolean pagoAplicado = false;
+        if (tipoPagoCBox.getSelectedItem().equals(TipoPago.PAGO_INTERES)) {
+            try {
+                pagoAplicado = controller.aplicarPagoIntereses(prestamo,
+                        datePicker.getDate(),
+                        Double.valueOf(montoPagoTxt.getText().isEmpty() ? "O" : montoPagoTxt.getText()),
+                        Double.valueOf(moraPagoTxt.getText().isEmpty() ? "0" : moraPagoTxt.getText()));
+            } catch (PrestamoException ex) {
+                JOptionPane.showMessageDialog(jFrame, ex.getMessage(), "ERROR APLICANDO PAGO", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            try {
+                pagoAplicado = controller.aplicarAbonoPrestamo(prestamo, datePicker.getDate(), Double.valueOf(montoPagoTxt.getText()));
+            } catch (PrestamoException ex) {
+                JOptionPane.showMessageDialog(jFrame, ex.getMessage(), "ERROR APLICANDO PAGO", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        if (pagoAplicado) {
+            reloadPagoTable();
+        }
+    }//GEN-LAST:event_aplicarPagoBtnActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField abonadoTxt;
     private javax.swing.JButton administrarClienteBtn;

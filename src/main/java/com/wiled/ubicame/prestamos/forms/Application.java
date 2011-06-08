@@ -93,6 +93,8 @@ public class Application extends javax.swing.JFrame {
         criterioBusquedaCombo.insertItemAt(CriterioBusqueda.APELLIDO, 3);
         
         criterioBusquedaCombo.setSelectedIndex(0);
+        
+        valorBusquedaTxt.grabFocus();
     }
 
     /** This method is called from within the constructor to
@@ -295,6 +297,7 @@ public class Application extends javax.swing.JFrame {
             }
             
             if(!listaClientes.isEmpty()) {
+                ((ResultTableModel) resultTable.getModel()).clientes.clear();
                 ((ResultTableModel) resultTable.getModel()).clientes.addAll(listaClientes);
                 resultTable.updateUI();
             } else {

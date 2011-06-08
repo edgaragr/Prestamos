@@ -11,7 +11,6 @@
       <property name="javax.persistence.jdbc.password" value="wiled"/>
       <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
       <property name="javax.persistence.jdbc.user" value="root"/>
-      <property name="eclipselink.ddl-generation" value="create-tables"/>
     </properties>
   </persistence-unit>
   <persistence-unit name="testPU" transaction-type="RESOURCE_LOCAL">

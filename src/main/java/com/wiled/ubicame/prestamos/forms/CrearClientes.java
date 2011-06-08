@@ -14,6 +14,8 @@ import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import java.awt.Frame;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
 
 /**
@@ -37,6 +39,17 @@ public class CrearClientes extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         this.frame = parent;
+        
+        telefonoTxt.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    onCreate();
+                }                
+            }            
+        });
+        
     }
 
     /** This method is called from within the constructor to
@@ -156,6 +169,10 @@ public class CrearClientes extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void crearBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crearBtnActionPerformed
+       onCreate();
+    }//GEN-LAST:event_crearBtnActionPerformed
+
+    private void onCreate() {
         // TODO add your handling code here:
         Controller controller = Controller.getInstance(PrestamoConstants.PROD_PU);
         String nombre = nombreTxt.getText();
@@ -171,9 +188,9 @@ public class CrearClientes extends javax.swing.JDialog {
             dispose();            
         } else {
             JOptionPane.showMessageDialog(rootPane, "Cliente no pudo ser creado", "ERROR", JOptionPane.ERROR_MESSAGE);
-        }        
-    }//GEN-LAST:event_crearBtnActionPerformed
-
+        } 
+    }
+    
     private void cancelarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarBtnActionPerformed
         // TODO add your handling code here:
         dispose();
