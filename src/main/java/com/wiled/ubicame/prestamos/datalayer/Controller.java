@@ -58,11 +58,21 @@ public class Controller {
     }
     
     public void remove(Object obj) throws Exception {
-        em.getTransaction().begin();
+        em.getTransaction().begin();                
         em.remove(obj);
         em.getTransaction().commit();
     }
     
+    public void removeAbono(Abono abono) {
+        Abono a = (Abono) em.find(Abono.class, abono.getId());
+        em.remove(a);
+    }
+    
+    public void removePagoInteres(PagoInteres interes) {
+        PagoInteres i = (PagoInteres) em.find(PagoInteres.class, interes.getId());
+        em.remove(i);
+    }
+        
     public List<Cliente> buscarClientePorNombre(String nombre) {
         Query q = em.createNamedQuery("Cliente.buscarNombre");
         q.setParameter("nombre", nombre);

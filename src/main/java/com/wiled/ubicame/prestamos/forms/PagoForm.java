@@ -91,8 +91,10 @@ public class PagoForm extends javax.swing.JDialog {
         pagosTable.setModel(new PagosTableModel(pagos));
         pagosTable.updateUI();
 
+        moraPagoTxt.setText("0");
+               
         pagosTable.addKeyListener(new KeyAdapter() {
-
+            
             @Override
             public void keyReleased(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_DELETE) {
@@ -102,10 +104,14 @@ public class PagoForm extends javax.swing.JDialog {
 
                     if( pago instanceof Abono) {
                         prestamo.getAbonos().remove((Abono) pago);
+                        //prestamo.getAbonos().remove();
+                        controller.removeAbono((Abono) pago);                        
                         prestamo.setMonto(prestamo.getMonto() + pago.getMonto());
                         controller.merge(prestamo);
                     } else if ( pago instanceof PagoInteres) {
                         prestamo.getPagos().remove((PagoInteres) pago);
+                        
+                        controller.removePagoInteres((PagoInteres) pago);
                         controller.merge(prestamo);
                     }
                     
@@ -519,7 +525,7 @@ public class PagoForm extends javax.swing.JDialog {
         
         boolean pagoAplicado = false;
         if (tipoPagoCBox.getSelectedItem().equals(TipoPago.PAGO_INTERES)) {
-            if (moraPagoTxt.getText().isEmpty() || !containsOnlyNumbers(moraPagoTxt.getText())) {
+            if (!containsOnlyNumbers(moraPagoTxt.getText())) {
                 JOptionPane.showMessageDialog(jFrame, "Por favor digite un valor numerico en el campo 'Mora'", "ERROR DE VALIDACION", JOptionPane.ERROR_MESSAGE);
                 moraPagoTxt.grabFocus();
                 return;
