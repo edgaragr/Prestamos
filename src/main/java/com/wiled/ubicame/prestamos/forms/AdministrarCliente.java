@@ -14,7 +14,9 @@ import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import javax.swing.JOptionPane;
-
+import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.containsOnlyNumbers;
+import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.isCedulaSizeValid;
+import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.isTelefonoSizeValid;
 /**
  *
  * @author edgar
@@ -170,6 +172,30 @@ public class AdministrarCliente extends javax.swing.JDialog {
     }//GEN-LAST:event_eliminarBtnActionPerformed
 
     private void actualizarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actualizarBtnActionPerformed
+        if(nombreTxt.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(rootPane, "Por favor introduzca un nombre", "ERROR", JOptionPane.ERROR_MESSAGE);
+            nombreTxt.grabFocus();
+            return;
+        }
+        
+        if(apellidoTxt.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(rootPane, "Por favor introduzca un apellido", "ERROR", JOptionPane.ERROR_MESSAGE);
+            apellidoTxt.grabFocus();
+            return;
+        }
+        
+        if(cedulaTxt.getText().isEmpty() || !containsOnlyNumbers(cedulaTxt.getText()) || isCedulaSizeValid(cedulaTxt.getText())) {
+            JOptionPane.showMessageDialog(rootPane, "Por favor introduzca una cedula valida", "ERROR", JOptionPane.ERROR_MESSAGE);
+            cedulaTxt.grabFocus();
+            return;            
+        }
+        
+        if(telefonoTxt.getText().isEmpty() || !containsOnlyNumbers(telefonoTxt.getText()) || isTelefonoSizeValid(telefonoTxt.getText())) {
+            JOptionPane.showMessageDialog(rootPane, "Por favor introduzca un telefono valida", "ERROR", JOptionPane.ERROR_MESSAGE);
+            telefonoTxt.grabFocus();
+            return;            
+        }
+        
         cliente.setNombre(nombreTxt.getText());
         cliente.setApellido(apellidoTxt.getText());
         cliente.setCedula(cedulaTxt.getText());
