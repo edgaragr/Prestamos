@@ -118,7 +118,7 @@ public class Application extends javax.swing.JFrame {
         resultTable = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        backupMenu = new javax.swing.JMenuItem();
         menuSalir = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         crearCliente = new javax.swing.JMenuItem();
@@ -158,8 +158,13 @@ public class Application extends javax.swing.JFrame {
         jMenu1.setText("Operaciones");
         jMenu1.setToolTipText("Opciones Generales");
 
-        jMenuItem1.setText("Realizar Backup");
-        jMenu1.add(jMenuItem1);
+        backupMenu.setText("Realizar Backup");
+        backupMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backupMenuActionPerformed(evt);
+            }
+        });
+        jMenu1.add(backupMenu);
 
         menuSalir.setText("Salir");
         menuSalir.addActionListener(new java.awt.event.ActionListener() {
@@ -316,6 +321,12 @@ public class Application extends javax.swing.JFrame {
         dispose();
     }//GEN-LAST:event_menuSalirActionPerformed
 
+    private void backupMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backupMenuActionPerformed
+        ExportForm form = new ExportForm(this, true);
+        form.setLocationRelativeTo(null);
+        form.setVisible(true);                
+    }//GEN-LAST:event_backupMenuActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -380,6 +391,7 @@ public class Application extends javax.swing.JFrame {
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem amortizarPrestamo;
+    private javax.swing.JMenuItem backupMenu;
     private javax.swing.JButton buscarBtn;
     private javax.swing.JMenuItem crearCliente;
     private javax.swing.JComboBox criterioBusquedaCombo;
@@ -389,7 +401,6 @@ public class Application extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JMenuItem menuSalir;
     private javax.swing.JTable resultTable;
