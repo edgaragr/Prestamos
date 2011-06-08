@@ -84,6 +84,14 @@ public class PagoForm extends javax.swing.JDialog {
 
         pagosTable.setModel(new PagosTableModel(pagos));
         pagosTable.updateUI();
+        
+        crearPrestamoBtn.setVisible(false);
+        
+        if(prestamo.getInteresAcumulado() == 0 && prestamo.getMonto() == 0) {
+            //Significa que el prestamo ya se pago
+            aplicarPagoBtn.setEnabled(false);
+            crearPrestamoBtn.setVisible(true);
+        }
     }
 
     private class PagosTableModel extends AbstractTableModel {
@@ -172,6 +180,7 @@ public class PagoForm extends javax.swing.JDialog {
         nameLabel = new javax.swing.JLabel();
         administrarClienteBtn = new javax.swing.JButton();
         fechaTxt = new javax.swing.JTextField();
+        crearPrestamoBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Pagos");
@@ -287,6 +296,14 @@ public class PagoForm extends javax.swing.JDialog {
 
         fechaTxt.setEditable(false);
 
+        crearPrestamoBtn.setBackground(new java.awt.Color(255, 204, 204));
+        crearPrestamoBtn.setText("CREAR NUEVO PRESTAMO");
+        crearPrestamoBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                crearPrestamoBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -295,19 +312,21 @@ public class PagoForm extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(montoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(tasaTxt))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                .addComponent(jLabel6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(interesesTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                    .addComponent(jLabel2)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(montoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(jLabel3)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(tasaTxt))
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                    .addComponent(jLabel6)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(interesesTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(crearPrestamoBtn))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -336,7 +355,8 @@ public class PagoForm extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(administrarClienteBtn)
-                    .addComponent(nameLabel))
+                    .addComponent(nameLabel)
+                    .addComponent(crearPrestamoBtn))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
@@ -369,6 +389,7 @@ public class PagoForm extends javax.swing.JDialog {
     private void administrarClienteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_administrarClienteBtnActionPerformed
         // TODO add your handling code here:
         AdministrarCliente adm = new AdministrarCliente(jFrame, true, cliente);
+        adm.setLocationRelativeTo(null);
         adm.setVisible(true);
     }//GEN-LAST:event_administrarClienteBtnActionPerformed
 
@@ -396,6 +417,9 @@ public class PagoForm extends javax.swing.JDialog {
         montoPagoTxt.setText("");
         
         montoPagoTxt.grabFocus();
+        
+        montoPagoTxt.setBackground(Color.WHITE);
+        montoPagoTxt.setForeground(Color.BLACK);
     }
 
     private void aplicarPagoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aplicarPagoBtnActionPerformed
@@ -444,10 +468,21 @@ public class PagoForm extends javax.swing.JDialog {
             reloadPagoTable();
         }
     }//GEN-LAST:event_aplicarPagoBtnActionPerformed
+
+    private void crearPrestamoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crearPrestamoBtnActionPerformed
+        // TODO add your handling code here:
+        CrearPrestamo form = new CrearPrestamo(jFrame, true, cliente);
+        form.setLocationRelativeTo(null);
+        form.setVisible(true);
+        
+        dispose();
+    }//GEN-LAST:event_crearPrestamoBtnActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField abonadoTxt;
     private javax.swing.JButton administrarClienteBtn;
     private javax.swing.JButton aplicarPagoBtn;
+    private javax.swing.JButton crearPrestamoBtn;
     private org.jdesktop.swingx.JXDatePicker datePicker;
     private javax.swing.JTextField fechaTxt;
     private javax.swing.JComboBox formaPagoCBox;
