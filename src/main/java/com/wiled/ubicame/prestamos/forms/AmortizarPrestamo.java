@@ -10,22 +10,39 @@
  */
 package com.wiled.ubicame.prestamos.forms;
 
+import java.awt.Color;
+import java.awt.Frame;
 import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamo.utils.PrestamoException;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import javax.swing.JOptionPane;
+import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.containsOnlyNumbers;
 
 /**
  *
  * @author edgar
  */
 public class AmortizarPrestamo extends javax.swing.JDialog {
-
+    private Frame frame;
     /** Creates new form AmortizarPrestamo */
     public AmortizarPrestamo(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         controller = Controller.getInstance(PrestamoConstants.PROD_PU);
+        this.frame = parent;
+        
+        tasaTxt.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    onCalcular();
+                }                
+            }            
+        });
     }
 
     /** This method is called from within the constructor to
@@ -96,16 +113,54 @@ public class AmortizarPrestamo extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void calcularBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calcularBtnActionPerformed
-        // TODO add your handling code here:
+    private void onCalcular() {
+            
+        if (montoTxt.getText().isEmpty() || !containsOnlyNumbers(montoTxt.getText())) {
+            JOptionPane.showMessageDialog(frame, "Por favor digite un monto", "ERROR DE VALIDACION", JOptionPane.ERROR_MESSAGE);
+            montoTxt.grabFocus();
+            montoTxt.setBackground(Color.red);
+            montoTxt.setForeground(Color.WHITE);
+            return;
+        }
+
+        if (tasaTxt.getText().isEmpty() || !containsOnlyNumbers(tasaTxt.getText())) {
+            tasaTxt.setBackground(Color.WHITE);
+            tasaTxt.setForeground(Color.BLACK);
+            
+            JOptionPane.showMessageDialog(frame, "Por favor digite una tasa valida", "ERROR DE VALIDACION", JOptionPane.ERROR_MESSAGE);
+            tasaTxt.grabFocus();
+            tasaTxt.setBackground(Color.red);
+            tasaTxt.setForeground(Color.WHITE);
+            return;
+        }
+        
         double monto = Double.valueOf(montoTxt.getText());
         float tasa = Float.valueOf(tasaTxt.getText());
         try {
             double resultado = controller.amortizarPrestamo(monto, tasa);
             JOptionPane.showMessageDialog(rootPane, "Cuotas de: RD$" + resultado + " pesos..", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+            
+            montoTxt.setBackground(Color.WHITE);
+            montoTxt.setForeground(Color.BLACK);
+            montoTxt.setText("");
+            
+            tasaTxt.setBackground(Color.WHITE);
+            tasaTxt.setForeground(Color.BLACK);
+            tasaTxt.setText("");
+            
+            montoTxt.updateUI();
+            tasaTxt.updateUI();
+            
+            montoTxt.grabFocus();
+            
         } catch (PrestamoException ex) {
             JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
         }
+    }
+    
+    private void calcularBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calcularBtnActionPerformed
+        // TODO add your handling code here:
+        onCalcular();
     }//GEN-LAST:event_calcularBtnActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
