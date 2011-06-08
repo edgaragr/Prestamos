@@ -185,13 +185,13 @@ public class CrearClientes extends javax.swing.JDialog {
             return;
         }
         
-        if(cedulaTxt.getText().isEmpty() || !containsOnlyNumbers(cedulaTxt.getText()) || isCedulaSizeValid(cedulaTxt.getText())) {
+        if(cedulaTxt.getText().isEmpty() || !containsOnlyNumbers(cedulaTxt.getText()) || !isCedulaSizeValid(cedulaTxt.getText())) {
             JOptionPane.showMessageDialog(rootPane, "Por favor introduzca una cedula valida", "ERROR", JOptionPane.ERROR_MESSAGE);
             cedulaTxt.grabFocus();
             return;            
         }
         
-        if(telefonoTxt.getText().isEmpty() || !containsOnlyNumbers(telefonoTxt.getText()) || isTelefonoSizeValid(telefonoTxt.getText())) {
+        if(telefonoTxt.getText().isEmpty() || !containsOnlyNumbers(telefonoTxt.getText()) || !isTelefonoSizeValid(telefonoTxt.getText())) {
             JOptionPane.showMessageDialog(rootPane, "Por favor introduzca un telefono valida", "ERROR", JOptionPane.ERROR_MESSAGE);
             telefonoTxt.grabFocus();
             return;            

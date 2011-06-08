@@ -42,7 +42,9 @@ public class PrestamoUtils {
     }
 
     public static boolean isCedulaSizeValid(String cedula) {
-        if (cedula.length() == 11) {
+        int len = cedula.length();
+        
+        if (len == 11) {
             return true;
         }
         return false;

@@ -10,6 +10,11 @@
  */
 package com.wiled.ubicame.prestamos.forms;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.impl.StdSchedulerFactory;
 import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
@@ -53,9 +58,15 @@ public class Application extends javax.swing.JFrame {
                     if(cliente.getPrestamos().isEmpty()) {
                         JOptionPane.showMessageDialog(getJFrame(), "Este cliente no posee prestamos", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
                     } else {
+                        valorBusquedaTxt.setText("");
+                        ((ResultTableModel) resultTable.getModel()).clientes.clear();
+                        resultTable.updateUI();
+                        
                         PagoForm form = new PagoForm(getJFrame(), true, cliente);
                         form.setLocationRelativeTo(null);
-                        form.setVisible(true);
+                        form.setVisible(true);                                                
+                        
+                        valorBusquedaTxt.grabFocus();
                     }                    
                 }
             }
@@ -98,7 +109,7 @@ public class Application extends javax.swing.JFrame {
         
         criterioBusquedaCombo.setSelectedIndex(0);
         
-        valorBusquedaTxt.grabFocus();
+        valorBusquedaTxt.grabFocus();   
     }
 
     /** This method is called from within the constructor to

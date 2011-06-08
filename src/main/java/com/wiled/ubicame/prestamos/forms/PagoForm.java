@@ -13,15 +13,21 @@ package com.wiled.ubicame.prestamos.forms;
 import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamo.utils.PrestamoException;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
+import com.wiled.ubicame.prestamos.entidades.Abono;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.Pago;
+import com.wiled.ubicame.prestamos.entidades.PagoInteres;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
 import com.wiled.ubicame.prestamos.entidades.TipoPago;
 import java.awt.Color;
 import java.awt.Frame;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.containsOnlyNumbers;
@@ -74,7 +80,6 @@ public class PagoForm extends javax.swing.JDialog {
         interesesTxt.setText(String.valueOf(prestamo.getInteresAcumulado()));
         interesesTxt.setEditable(false);
 
-
         double totalAbonado = Controller.getTotalAbonado(prestamo.getAbonos());
         abonadoTxt.setText(String.valueOf(totalAbonado));
         abonadoTxt.setEditable(false);
@@ -85,13 +90,56 @@ public class PagoForm extends javax.swing.JDialog {
 
         pagosTable.setModel(new PagosTableModel(pagos));
         pagosTable.updateUI();
+
+        pagosTable.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if(e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    Pago pago = ((PagosTableModel) pagosTable.getModel()).pagos.get(pagosTable.getSelectedRow());
+                    ((PagosTableModel) pagosTable.getModel()).pagos.remove(pagosTable.getSelectedRow());
+                    pagosTable.updateUI();
+                    
+                    if( pago instanceof Abono) {
+                        prestamo.getAbonos().remove((Abono) pago);
+                        controller.merge(prestamo);
+                        controller.renegociarPrestamo(prestamo);
+                    } else if ( pago instanceof PagoInteres) {
+                        prestamo.getPagos().remove((PagoInteres) pago);
+                        controller.merge(prestamo);
+                        controller.renegociarPrestamo(prestamo);
+                    }
+
+                    List<Pago> pagos = new ArrayList<Pago>();
+                    pagos.addAll(prestamo.getAbonos());
+                    pagos.addAll(prestamo.getPagos());
+
+                    pagosTable.setModel(new PagosTableModel(pagos));
+                    pagosTable.updateUI();
+                    
+                    montoTxt.setText(String.valueOf(prestamo.getMonto()));
+                    interesesTxt.setText(String.valueOf(prestamo.getInteresAcumulado()));
+                    
+                    double totalAbonado = Controller.getTotalAbonado(prestamo.getAbonos());
+                    abonadoTxt.setText(String.valueOf(totalAbonado));
+                    
+                    JOptionPane.showMessageDialog(rootPane, "Pago eliminado exitosamente", "Eliminacion de Pago", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }            
+        });
         
         crearPrestamoBtn.setVisible(false);
-        
-        if(prestamo.getInteresAcumulado() == 0 && prestamo.getMonto() == 0) {
+
+        if (prestamo.getInteresAcumulado() == 0 && prestamo.getMonto() == 0) {
             //Significa que el prestamo ya se pago
             aplicarPagoBtn.setEnabled(false);
             crearPrestamoBtn.setVisible(true);
+        } else {
+            try {
+                cuotaTxt.setText(String.valueOf(controller.amortizarPrestamo(prestamo.getMonto(), prestamo.getTasa())));
+            } catch (PrestamoException ex) {
+                JOptionPane.showMessageDialog(parent, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
@@ -182,6 +230,8 @@ public class PagoForm extends javax.swing.JDialog {
         administrarClienteBtn = new javax.swing.JButton();
         fechaTxt = new javax.swing.JTextField();
         crearPrestamoBtn = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        cuotaTxt = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Pagos");
@@ -305,6 +355,10 @@ public class PagoForm extends javax.swing.JDialog {
             }
         });
 
+        jLabel1.setText("Cuota:");
+
+        cuotaTxt.setEditable(false);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -330,22 +384,28 @@ public class PagoForm extends javax.swing.JDialog {
                             .addComponent(crearPrestamoBtn))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addGap(4, 4, 4)
-                                .addComponent(formaPagoCBox, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(fechaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel7)
-                                .addGap(18, 18, 18)
-                                .addComponent(abonadoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(nameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(administrarClienteBtn))))
+                                .addComponent(administrarClienteBtn))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(jLabel7)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(abonadoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabel1)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(cuotaTxt))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(jLabel4)
+                                        .addGap(4, 4, 4)
+                                        .addComponent(formaPagoCBox, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel5)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(fechaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -360,23 +420,25 @@ public class PagoForm extends javax.swing.JDialog {
                     .addComponent(crearPrestamoBtn))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(montoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3)
-                            .addComponent(tasaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4)
-                            .addComponent(formaPagoCBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel6)
-                            .addComponent(interesesTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel7)
-                            .addComponent(abonadoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel2)
+                        .addComponent(montoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel3)
+                        .addComponent(tasaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel4)
+                        .addComponent(formaPagoCBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(fechaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel5)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel6)
+                        .addComponent(interesesTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel7)
+                        .addComponent(abonadoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel1))
+                    .addComponent(cuotaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -392,6 +454,10 @@ public class PagoForm extends javax.swing.JDialog {
         AdministrarCliente adm = new AdministrarCliente(jFrame, true, cliente);
         adm.setLocationRelativeTo(null);
         adm.setVisible(true);
+        
+        if(adm.isClienteEliminado()) {
+            dispose();
+        }
     }//GEN-LAST:event_administrarClienteBtnActionPerformed
 
     private void reloadPagoTable() {
@@ -413,12 +479,12 @@ public class PagoForm extends javax.swing.JDialog {
 
         montoTxt.updateUI();
         abonadoTxt.updateUI();
-        
+
         moraPagoTxt.setText("");
         montoPagoTxt.setText("");
-        
+
         montoPagoTxt.grabFocus();
-        
+
         montoPagoTxt.setBackground(Color.WHITE);
         montoPagoTxt.setForeground(Color.BLACK);
     }
@@ -432,7 +498,7 @@ public class PagoForm extends javax.swing.JDialog {
             montoPagoTxt.setForeground(Color.WHITE);
             return;
         }
-        
+
         if (datePicker.getDate() == null) {
             JOptionPane.showMessageDialog(jFrame, "Por favor digite una fecha", "ERROR DE VALIDACION", JOptionPane.ERROR_MESSAGE);
             datePicker.grabFocus();
@@ -446,15 +512,20 @@ public class PagoForm extends javax.swing.JDialog {
             tipoPagoCBox.grabFocus();
             return;
         }
+
+        if (prestamo.getInteresAcumulado() == 0 && prestamo.getMonto() == 0 || prestamo.getMonto() < 0) {
+            JOptionPane.showMessageDialog(rootPane, "Este prestamo ya ha sido saldado", "ERROR", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         
         boolean pagoAplicado = false;
         if (tipoPagoCBox.getSelectedItem().equals(TipoPago.PAGO_INTERES)) {
-             if (moraPagoTxt.getText().isEmpty() || !containsOnlyNumbers(moraPagoTxt.getText())) {       
-                 JOptionPane.showMessageDialog(jFrame, "Por favor digite un valor numerico en el campo 'Mora'", "ERROR DE VALIDACION", JOptionPane.ERROR_MESSAGE);
-                 moraPagoTxt.grabFocus();
-                 return;
-             }
-            
+            if (moraPagoTxt.getText().isEmpty() || !containsOnlyNumbers(moraPagoTxt.getText())) {
+                JOptionPane.showMessageDialog(jFrame, "Por favor digite un valor numerico en el campo 'Mora'", "ERROR DE VALIDACION", JOptionPane.ERROR_MESSAGE);
+                moraPagoTxt.grabFocus();
+                return;
+            }
+
             try {
                 pagoAplicado = controller.aplicarPagoIntereses(prestamo,
                         datePicker.getDate(),
@@ -481,19 +552,20 @@ public class PagoForm extends javax.swing.JDialog {
         CrearPrestamo form = new CrearPrestamo(jFrame, true, cliente);
         form.setLocationRelativeTo(null);
         form.setVisible(true);
-        
+
         dispose();
     }//GEN-LAST:event_crearPrestamoBtnActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField abonadoTxt;
     private javax.swing.JButton administrarClienteBtn;
     private javax.swing.JButton aplicarPagoBtn;
     private javax.swing.JButton crearPrestamoBtn;
+    private javax.swing.JTextField cuotaTxt;
     private org.jdesktop.swingx.JXDatePicker datePicker;
     private javax.swing.JTextField fechaTxt;
     private javax.swing.JComboBox formaPagoCBox;
     private javax.swing.JTextField interesesTxt;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;

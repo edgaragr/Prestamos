@@ -22,7 +22,12 @@ import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.isTelefonoSizeValid
  * @author edgar
  */
 public class AdministrarCliente extends javax.swing.JDialog {
+    private boolean clienteEliminado;
 
+    public boolean isClienteEliminado() {
+        return clienteEliminado;
+    }
+        
     /** Creates new form AdministrarCliente */
     public AdministrarCliente(java.awt.Frame parent, boolean modal, Cliente cliente) {
         super(parent, modal);
@@ -166,6 +171,9 @@ public class AdministrarCliente extends javax.swing.JDialog {
         try {
             controller.remove(cliente);
             JOptionPane.showMessageDialog(rootPane, "Cliente eliminado exitosamente", "ELIMINANACION DE CLIENTE", JOptionPane.INFORMATION_MESSAGE);
+            
+            clienteEliminado = true;
+            dispose();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "ERROR ELIMINANDO CLIENTE", JOptionPane.ERROR_MESSAGE);
         }
@@ -203,6 +211,8 @@ public class AdministrarCliente extends javax.swing.JDialog {
         
         controller.merge(cliente);
         JOptionPane.showMessageDialog(rootPane, "Cliente actualizado exitosamente", "ACTUALIZACION DE CLIENTE", JOptionPane.INFORMATION_MESSAGE);
+        
+        dispose();
     }//GEN-LAST:event_actualizarBtnActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

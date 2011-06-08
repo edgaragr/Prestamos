@@ -203,7 +203,7 @@ public class Controller {
         return true;
     }
     
-    private void renegociarPrestamo(Prestamo p) {
+    public void renegociarPrestamo(Prestamo p) {
         refresh(p);
         
         double ultimoAbono = p.getAbonos().get(p.getAbonos().size() - 1).getMonto();
