@@ -292,7 +292,7 @@ public class Controller {
         return null;
     }
     
-    public Prestamo buscarPrestamo(int id) {
+    public Prestamo buscarPrestamo(Long id) {
         Prestamo prestamo = em.find(Prestamo.class, id);                        
         return prestamo;
     }
@@ -326,15 +326,15 @@ public class Controller {
         switch (formaPago) {
             case DIARIO:
                 trigger = newTrigger()
-                    .withIdentity("trigger"+prestamo.getId(), "diarios")
-                    .startNow()
+                    .startAt(tomorrowAt(15, 0, 0))
+                    .withIdentity("trigger"+prestamo.getId(), "diarios")                    
                     .withSchedule(simpleSchedule().withIntervalInHours(24).repeatForever())
                     .build();
                 break;
             case MENSUAL:                              
                 trigger = newTrigger()
                     .withIdentity("trigger"+prestamo.getId(), "mensuales")
-                    .startAt(tomorrowAt(15, 0, 0))  // 15:00:00 tomorrow
+                    .startAt(futureDate(30, IntervalUnit.DAY)) 
                     .withSchedule(calendarIntervalSchedule()
                         .withIntervalInMonths(1)) // interval is set in calendar months
                     .build();
@@ -342,7 +342,7 @@ public class Controller {
             case QUINCENAL:
                 trigger = newTrigger()
                     .withIdentity("trigger"+prestamo.getId(), "quincenales")
-                    .startAt(tomorrowAt(15, 0, 0))  // 15:00:00 tomorrow
+                    .startAt(futureDate(15, IntervalUnit.DAY)) 
                     .withSchedule(calendarIntervalSchedule()
                         .withIntervalInWeeks(2))
                     .build();
@@ -350,13 +350,12 @@ public class Controller {
             case SEMANAL:
                 trigger = newTrigger()
                     .withIdentity("trigger"+prestamo.getId(), "quincenales")
-                    .startAt(tomorrowAt(15, 0, 0))  // 15:00:00 tomorrow
+                    .startAt(futureDate(7, IntervalUnit.DAY))  
                     .withSchedule(calendarIntervalSchedule()
                         .withIntervalInWeeks(1))
                     .build();
                 break;
         }
-        
 
         // Tell quartz to schedule the job using our trigger
         scheduler.scheduleJob(job, trigger);
