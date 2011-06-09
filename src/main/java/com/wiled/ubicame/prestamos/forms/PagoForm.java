@@ -46,7 +46,7 @@ public class PagoForm extends javax.swing.JDialog {
         initComponents();
         jFrame = parent;
     }
-
+   
     public PagoForm(java.awt.Frame parent, boolean modal, Cliente cliente) {
         super(parent, modal);
         initComponents();
