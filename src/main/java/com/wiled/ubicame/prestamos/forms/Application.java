@@ -52,6 +52,11 @@ public class Application extends javax.swing.JFrame {
                     
                     if(cliente.getPrestamos().isEmpty()) {
                         JOptionPane.showMessageDialog(getJFrame(), "Este cliente no posee prestamos", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
+                        
+                        AdministrarCliente form = new AdministrarCliente(getJFrame(), true, cliente);
+                        form.setLocationRelativeTo(null);
+                        form.setVisible(true);
+                                                
                     } else {
                         valorBusquedaTxt.setText("");
                         ((ResultTableModel) resultTable.getModel()).clientes.clear();
