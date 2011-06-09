@@ -482,6 +482,9 @@ public class PagoForm extends javax.swing.JDialog {
         double totalAbonado = Controller.getTotalAbonado(prestamo.getAbonos());
         abonadoTxt.setText(String.valueOf(totalAbonado));
 
+        interesesTxt.setText(String.valueOf(prestamo.getInteresAcumulado()));
+        interesesTxt.updateUI();
+        
         montoTxt.updateUI();
         abonadoTxt.updateUI();
 
