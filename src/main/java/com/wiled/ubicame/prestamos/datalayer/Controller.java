@@ -4,18 +4,33 @@
  */
 package com.wiled.ubicame.prestamos.datalayer;
 
+import org.quartz.Trigger;
 import com.wiled.ubicame.prestamo.utils.PrestamoException;
 import com.wiled.ubicame.prestamos.entidades.Abono;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.FormaPago;
 import com.wiled.ubicame.prestamos.entidades.PagoInteres;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
+import com.wiled.ubicame.prestamos.schedules.PrestamoJob;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
+import javax.swing.JOptionPane;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.impl.StdSchedulerFactory;
+
+import static org.quartz.TriggerBuilder.*;
+import static org.quartz.JobBuilder.*;
+import static org.quartz.DateBuilder.*;
+import static org.quartz.SimpleScheduleBuilder.*;
+import static org.quartz.CalendarIntervalScheduleBuilder.*;
 
 /**
  *
@@ -25,12 +40,23 @@ public class Controller {
     private EntityManagerFactory emf;
     private EntityManager em;
     private static Controller controller;
+    private Scheduler scheduler;
     
     private Controller(String persistenceUnit) {
         emf = Persistence.createEntityManagerFactory(persistenceUnit);
         em = emf.createEntityManager();
+        try {
+            scheduler  = StdSchedulerFactory.getDefaultScheduler();
+            scheduler.start();
+        } catch (SchedulerException sex) {
+            JOptionPane.showMessageDialog(null, sex.getMessage(), "ERROR SCHEDULER", JOptionPane.ERROR_MESSAGE);
+        }
     }
-    
+
+    public Scheduler getScheduler() {
+        return scheduler;
+    }
+        
     public static Controller getInstance(String persistenceUnit) {
         if(controller == null) {
             controller = new Controller(persistenceUnit);
@@ -266,7 +292,12 @@ public class Controller {
         return null;
     }
     
-    public Prestamo crearPrestamo(Cliente cliente, String comentario, Date fecha, FormaPago formaPago, double monto, float tasa) throws PrestamoException {
+    public Prestamo buscarPrestamo(int id) {
+        Prestamo prestamo = em.find(Prestamo.class, id);                        
+        return prestamo;
+    }
+    
+    public Prestamo crearPrestamo(Cliente cliente, String comentario, Date fecha, FormaPago formaPago, double monto, float tasa) throws PrestamoException, SchedulerException {
         if(monto < 0) throw new PrestamoException("Valor del 'monto' es menor que cero (0)");
          
         Prestamo prestamo = new Prestamo();
@@ -278,6 +309,57 @@ public class Controller {
         prestamo.setTasa(tasa);
         
         persist(prestamo);
+                
+        // Crear el scheduler para generar los cortes de este prestamo
+        JobDataMap map = new JobDataMap();
+        map.put(PrestamoJob.PRESTAMO, prestamo.getId());
+        
+        JobDetail job = newJob(PrestamoJob.class)
+                .withIdentity("job" + prestamo.getId(), "prestamos")
+                .usingJobData(map)
+                .requestRecovery()
+                .withDescription(prestamo.getComentario())
+                .build();
+        
+        Trigger trigger = null;
+        
+        switch (formaPago) {
+            case DIARIO:
+                trigger = newTrigger()
+                    .withIdentity("trigger"+prestamo.getId(), "diarios")
+                    .startNow()
+                    .withSchedule(simpleSchedule().withIntervalInHours(24).repeatForever())
+                    .build();
+                break;
+            case MENSUAL:                              
+                trigger = newTrigger()
+                    .withIdentity("trigger"+prestamo.getId(), "mensuales")
+                    .startAt(tomorrowAt(15, 0, 0))  // 15:00:00 tomorrow
+                    .withSchedule(calendarIntervalSchedule()
+                        .withIntervalInMonths(1)) // interval is set in calendar months
+                    .build();
+                break;
+            case QUINCENAL:
+                trigger = newTrigger()
+                    .withIdentity("trigger"+prestamo.getId(), "quincenales")
+                    .startAt(tomorrowAt(15, 0, 0))  // 15:00:00 tomorrow
+                    .withSchedule(calendarIntervalSchedule()
+                        .withIntervalInWeeks(2))
+                    .build();
+                break;
+            case SEMANAL:
+                trigger = newTrigger()
+                    .withIdentity("trigger"+prestamo.getId(), "quincenales")
+                    .startAt(tomorrowAt(15, 0, 0))  // 15:00:00 tomorrow
+                    .withSchedule(calendarIntervalSchedule()
+                        .withIntervalInWeeks(1))
+                    .build();
+                break;
+        }
+        
+
+        // Tell quartz to schedule the job using our trigger
+        scheduler.scheduleJob(job, trigger);
         
         if(prestamo.getId() != null)
             return prestamo;
