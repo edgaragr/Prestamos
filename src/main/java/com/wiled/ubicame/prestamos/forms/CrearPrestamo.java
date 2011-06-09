@@ -18,6 +18,7 @@ import com.wiled.ubicame.prestamos.entidades.FormaPago;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
 import java.util.Date;
 import javax.swing.JOptionPane;
+import org.quartz.SchedulerException;
 import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.containsOnlyNumbers;
 /**
  *
@@ -225,7 +226,9 @@ public class CrearPrestamo extends javax.swing.JDialog {
             }            
         } catch (PrestamoException ex) {
             JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
-        }         
+        } catch (SchedulerException sex) {
+            JOptionPane.showMessageDialog(rootPane, sex.getMessage(), "ERROR SCHEDULER", JOptionPane.ERROR_MESSAGE);
+        }        
     }//GEN-LAST:event_crearBtnActionPerformed
         
     // Variables declaration - do not modify//GEN-BEGIN:variables
