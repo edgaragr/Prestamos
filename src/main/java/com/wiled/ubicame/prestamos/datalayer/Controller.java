@@ -115,7 +115,7 @@ public class Controller {
                 
                 PagoInteres pago = new PagoInteres();
                 pago.setMonto(Math.abs(restante));
-                pago.setMora(0);
+                pago.setMora(mora);
                 pago.setPrestamo(prestamo);
                 pago.setFecha(fecha);
                             
@@ -140,7 +140,7 @@ public class Controller {
             //Aplicar un pago normal
             PagoInteres pago = new PagoInteres();
             pago.setMonto(monto);
-            pago.setMora(0);
+            pago.setMora(mora);
             pago.setPrestamo(prestamo);
             pago.setFecha(fecha);
     
