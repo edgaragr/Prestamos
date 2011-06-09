@@ -488,7 +488,7 @@ public class PagoForm extends javax.swing.JDialog {
         montoTxt.updateUI();
         abonadoTxt.updateUI();
 
-        moraPagoTxt.setText("");
+        moraPagoTxt.setText("0");
         montoPagoTxt.setText("");
 
         montoPagoTxt.grabFocus();
