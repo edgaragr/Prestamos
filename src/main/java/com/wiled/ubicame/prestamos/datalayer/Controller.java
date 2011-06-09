@@ -4,6 +4,8 @@
  */
 package com.wiled.ubicame.prestamos.datalayer;
 
+import org.slf4j.Logger;
+import com.wiled.ubicame.prestamos.entidades.Usuario;
 import org.quartz.Trigger;
 import com.wiled.ubicame.prestamo.utils.PrestamoException;
 import com.wiled.ubicame.prestamos.entidades.Abono;
@@ -12,7 +14,6 @@ import com.wiled.ubicame.prestamos.entidades.FormaPago;
 import com.wiled.ubicame.prestamos.entidades.PagoInteres;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
 import com.wiled.ubicame.prestamos.schedules.PrestamoJob;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -25,6 +26,7 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.LoggerFactory;
 
 import static org.quartz.TriggerBuilder.*;
 import static org.quartz.JobBuilder.*;
@@ -41,18 +43,34 @@ public class Controller {
     private EntityManager em;
     private static Controller controller;
     private Scheduler scheduler;
+    private final Logger log;
     
     private Controller(String persistenceUnit) {
         emf = Persistence.createEntityManagerFactory(persistenceUnit);
         em = emf.createEntityManager();
+        log = LoggerFactory.getLogger(Controller.class);
+        
         try {
             scheduler  = StdSchedulerFactory.getDefaultScheduler();
             scheduler.start();
         } catch (SchedulerException sex) {
             JOptionPane.showMessageDialog(null, sex.getMessage(), "ERROR SCHEDULER", JOptionPane.ERROR_MESSAGE);
-        }
+        }                
     }
 
+    public boolean validateUser(String user, char[] password) {
+        log.info("********************** Validando informacion de usuario: " + user + " y password: " + new String(password));
+        
+        Query q = em.createNamedQuery("Usuario.buscarUsuario");
+        q.setParameter("usuario", user);
+        q.setParameter("password", new String(password));
+        
+        Usuario usuario = (Usuario) q.getSingleResult();
+        
+        if(usuario != null) return true;
+        return false;                
+    }
+    
     public Scheduler getScheduler() {
         return scheduler;
     }
@@ -64,7 +82,7 @@ public class Controller {
         
         return controller;
     }
-    
+        
     public void persist(Object obj) {
         em.getTransaction().begin();
         em.persist(obj);

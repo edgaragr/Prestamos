@@ -349,13 +349,13 @@ public class Application extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {        
-        final LoginService loginService = new PrestamoLoginService();
+        final LoginService loginService = new PrestamoLoginService();        
         
         UIManager.put("JXLoginPane.banner.darkBackground", Color.ORANGE);
         UIManager.put("JXLoginPane.banner.lightBackground", Color.ORANGE.brighter());
         UIManager.put("JXLoginPane.banner.font", new Font("Arial", Font.ITALIC, 35));
         UIManager.put("JXLoginPane.banner.foreground", Color.WHITE);
-        
+                       
         Status status = JXLoginPane.showLoginDialog(null, loginService);
         
         if(status == JXLoginPane.Status.SUCCEEDED) {

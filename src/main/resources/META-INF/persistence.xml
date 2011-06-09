@@ -6,6 +6,7 @@
     <class>com.wiled.ubicame.prestamos.entidades.Prestamo</class>
     <class>com.wiled.ubicame.prestamos.entidades.Abono</class>
     <class>com.wiled.ubicame.prestamos.entidades.PagoInteres</class>
+    <class>com.wiled.ubicame.prestamos.entidades.Usuario</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/prestamos"/>
