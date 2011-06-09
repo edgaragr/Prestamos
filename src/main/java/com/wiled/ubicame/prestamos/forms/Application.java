@@ -10,6 +10,13 @@
  */
 package com.wiled.ubicame.prestamos.forms;
 
+import org.jdesktop.swingx.JXLoginPane.Status;
+import org.jdesktop.swingx.auth.LoginService;
+import com.wiled.ubicame.prestamo.security.PrestamoLoginService;
+import org.jdesktop.swingx.JXLoginPane;
+import java.awt.Color;
+import java.awt.Font;
+import javax.swing.UIManager;
 import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
@@ -341,16 +348,28 @@ public class Application extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                Application a = new Application();
-                a.setLocationRelativeTo(null);
-                a.setVisible(true);
-            }
-        });
+    public static void main(String args[]) {        
+        final LoginService loginService = new PrestamoLoginService();
+        
+        UIManager.put("JXLoginPane.banner.darkBackground", Color.ORANGE);
+        UIManager.put("JXLoginPane.banner.lightBackground", Color.ORANGE.brighter());
+        UIManager.put("JXLoginPane.banner.font", new Font("Arial", Font.ITALIC, 35));
+        UIManager.put("JXLoginPane.banner.foreground", Color.WHITE);
+        
+        Status status = JXLoginPane.showLoginDialog(null, loginService);
+        
+        if(status == JXLoginPane.Status.SUCCEEDED) {
+            java.awt.EventQueue.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    Application a = new Application();
+                    a.setLocationRelativeTo(null);
+                    a.setVisible(true);
+                }
+            });
+        } else {
+            System.exit(0);
+        }
     }
     
     private class ResultTableModel extends AbstractTableModel {
