@@ -19,6 +19,7 @@ import com.wiled.ubicame.prestamos.entidades.Pago;
 import com.wiled.ubicame.prestamos.entidades.PagoInteres;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
 import com.wiled.ubicame.prestamos.entidades.TipoPago;
+import com.wiled.ubicame.prestamos.utils.PrestamoUtils;
 import java.awt.Color;
 import java.awt.Frame;
 import java.awt.event.KeyAdapter;
@@ -26,10 +27,12 @@ import java.awt.event.KeyEvent;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.print.PrintException;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
-import static com.wiled.ubicame.prestamos.utils.PrestamoUtils.containsOnlyNumbers;
-
+import static com.wiled.ubicame.prestamos.utils.PrestamoUtils.*;
 /**
  *
  * @author edgar
@@ -527,6 +530,8 @@ public class PagoForm extends javax.swing.JDialog {
         }
         
         boolean pagoAplicado = false;
+        String concepto = "";
+        
         if (tipoPagoCBox.getSelectedItem().equals(TipoPago.PAGO_INTERES)) {
             if (!containsOnlyNumbers(moraPagoTxt.getText())) {
                 JOptionPane.showMessageDialog(jFrame, "Por favor digite un valor numerico en el campo 'Mora'", "ERROR DE VALIDACION", JOptionPane.ERROR_MESSAGE);
@@ -539,12 +544,17 @@ public class PagoForm extends javax.swing.JDialog {
                         datePicker.getDate(),
                         Double.valueOf(montoPagoTxt.getText()),
                         Double.valueOf(moraPagoTxt.getText()));
+                
+                concepto = "PAGO INTERES";
+                
             } catch (PrestamoException ex) {
                 JOptionPane.showMessageDialog(jFrame, ex.getMessage(), "ERROR APLICANDO PAGO", JOptionPane.ERROR_MESSAGE);
             }
         } else {
             try {
                 pagoAplicado = controller.aplicarAbonoPrestamo(prestamo, datePicker.getDate(), Double.valueOf(montoPagoTxt.getText()));
+                
+                concepto = "ABONO";
             } catch (PrestamoException ex) {
                 JOptionPane.showMessageDialog(jFrame, ex.getMessage(), "ERROR APLICANDO PAGO", JOptionPane.ERROR_MESSAGE);
             }
@@ -552,6 +562,23 @@ public class PagoForm extends javax.swing.JDialog {
 
         if (pagoAplicado) {
             reloadPagoTable();
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append("Sistema de Prestamos\n");
+            sb.append("--------------------\n\n");
+            sb.append("Cliente: ").append(prestamo.getCliente()).append("\n");
+            sb.append("Monto Pagado: RD$").append(montoPagoTxt.getText()).append("\n");
+            sb.append("Concepto: ").append(concepto).append("\n");
+            
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            sb.append("Fecha: ").append(sdf.format(datePicker.getDate())).append("\n\n\n\n\n");
+            sb.append("--------------------\n");
+            sb.append("      Firma");
+            try {
+                imprimirFactura(sb.toString());
+            } catch (PrintException ex) {
+                JOptionPane.showMessageDialog(jFrame, ex.getMessage(), "ERROR IMPRIMIENDO FACTURA", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }//GEN-LAST:event_aplicarPagoBtnActionPerformed
 
