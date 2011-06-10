@@ -309,7 +309,7 @@ public class Application extends javax.swing.JFrame {
                     }
                     break;
                 case NOMBRE:
-                    listaClientes = controller.buscarClientePorApellido("%"+valorDeBusqueda+"%");
+                    listaClientes = controller.buscarClientePorNombre("%"+valorDeBusqueda+"%");
                     break;
                 case TELEFONO:
                     if(containsOnlyNumbers(valorDeBusqueda) && isTelefonoSizeValid(valorDeBusqueda)) {
