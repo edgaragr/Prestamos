@@ -4,6 +4,7 @@
  */
 package com.wiled.ubicame.prestamos.datalayer;
 
+import org.quartz.JobKey;
 import org.slf4j.Logger;
 import com.wiled.ubicame.prestamos.entidades.Usuario;
 import org.quartz.Trigger;
@@ -97,6 +98,10 @@ public class Controller {
         em.getTransaction().commit();
     }
     
+    public void eliminarJob(JobKey jk) throws SchedulerException {
+        scheduler.deleteJob(jk);
+    }
+        
     public void refresh(Object obj) {
         em.refresh(obj);
     }
