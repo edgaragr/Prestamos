@@ -10,8 +10,8 @@
  */
 package com.wiled.ubicame.prestamos.forms;
 
-import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
-import com.wiled.ubicame.prestamo.utils.PrestamoException;
+import com.wiled.ubicame.prestamos.utils.PrestamoConstants;
+import com.wiled.ubicame.prestamos.utils.PrestamoException;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Abono;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
-import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.containsOnlyNumbers;
+import static com.wiled.ubicame.prestamos.utils.PrestamoUtils.containsOnlyNumbers;
 
 /**
  *

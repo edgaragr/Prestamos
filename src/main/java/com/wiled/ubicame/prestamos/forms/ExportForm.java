@@ -10,7 +10,7 @@
  */
 package com.wiled.ubicame.prestamos.forms;
 
-import com.wiled.ubicame.prestamo.utils.PrestamoUtils;
+import com.wiled.ubicame.prestamos.utils.PrestamoUtils;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.JOptionPane;

@@ -12,14 +12,14 @@ package com.wiled.ubicame.prestamos.forms;
 
 import java.awt.Color;
 import java.awt.Frame;
-import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
-import com.wiled.ubicame.prestamo.utils.PrestamoException;
+import com.wiled.ubicame.prestamos.utils.PrestamoConstants;
+import com.wiled.ubicame.prestamos.utils.PrestamoException;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JOptionPane;
-import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.containsOnlyNumbers;
+import static com.wiled.ubicame.prestamos.utils.PrestamoUtils.containsOnlyNumbers;
 
 /**
  *

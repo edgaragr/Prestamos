@@ -12,12 +12,12 @@ package com.wiled.ubicame.prestamos.forms;
 
 import org.jdesktop.swingx.JXLoginPane.Status;
 import org.jdesktop.swingx.auth.LoginService;
-import com.wiled.ubicame.prestamo.security.PrestamoLoginService;
+import com.wiled.ubicame.prestamos.security.PrestamoLoginService;
 import org.jdesktop.swingx.JXLoginPane;
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.UIManager;
-import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
+import com.wiled.ubicame.prestamos.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.CriterioBusqueda;
@@ -30,9 +30,9 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
-import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.containsOnlyNumbers;
-import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.isCedulaSizeValid;
-import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.isTelefonoSizeValid;
+import static com.wiled.ubicame.prestamos.utils.PrestamoUtils.containsOnlyNumbers;
+import static com.wiled.ubicame.prestamos.utils.PrestamoUtils.isCedulaSizeValid;
+import static com.wiled.ubicame.prestamos.utils.PrestamoUtils.isTelefonoSizeValid;
 
 /**
  *

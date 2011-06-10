@@ -10,13 +10,13 @@
  */
 package com.wiled.ubicame.prestamos.forms;
 
-import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
+import com.wiled.ubicame.prestamos.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import javax.swing.JOptionPane;
-import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.containsOnlyNumbers;
-import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.isCedulaSizeValid;
-import static com.wiled.ubicame.prestamo.utils.PrestamoUtils.isTelefonoSizeValid;
+import static com.wiled.ubicame.prestamos.utils.PrestamoUtils.containsOnlyNumbers;
+import static com.wiled.ubicame.prestamos.utils.PrestamoUtils.isCedulaSizeValid;
+import static com.wiled.ubicame.prestamos.utils.PrestamoUtils.isTelefonoSizeValid;
 /**
  *
  * @author edgar

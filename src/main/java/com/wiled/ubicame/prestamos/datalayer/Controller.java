@@ -7,7 +7,7 @@ package com.wiled.ubicame.prestamos.datalayer;
 import org.slf4j.Logger;
 import com.wiled.ubicame.prestamos.entidades.Usuario;
 import org.quartz.Trigger;
-import com.wiled.ubicame.prestamo.utils.PrestamoException;
+import com.wiled.ubicame.prestamos.utils.PrestamoException;
 import com.wiled.ubicame.prestamos.entidades.Abono;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.FormaPago;

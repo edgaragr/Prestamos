@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.wiled.ubicame.prestamo.utils;
+package com.wiled.ubicame.prestamos.utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

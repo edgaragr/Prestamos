@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.wiled.ubicame.prestamo.security;
+package com.wiled.ubicame.prestamos.security;
 
-import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
+import com.wiled.ubicame.prestamos.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import org.jdesktop.swingx.auth.LoginService;
 import org.slf4j.Logger;

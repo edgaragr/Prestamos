@@ -4,8 +4,8 @@
  */
 package com.wiled.ubicame.prestamos.schedules;
 
-import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
-import com.wiled.ubicame.prestamo.utils.PrestamoException;
+import com.wiled.ubicame.prestamos.utils.PrestamoConstants;
+import com.wiled.ubicame.prestamos.utils.PrestamoException;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
 import org.quartz.Job;
