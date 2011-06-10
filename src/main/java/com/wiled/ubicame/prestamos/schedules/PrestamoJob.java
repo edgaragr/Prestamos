@@ -8,11 +8,13 @@ import com.wiled.ubicame.prestamos.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.utils.PrestamoException;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
+import java.util.logging.Level;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +37,19 @@ public class PrestamoJob implements Job {
         Controller database = Controller.getInstance(PrestamoConstants.PROD_PU);
         Prestamo prestamo = database.buscarPrestamo(prestamoId);
                 
+        double interesesAcumulados = prestamo.getInteresAcumulado();
+        
+        if(interesesAcumulados == 0 && prestamo.getMonto() == 0) {
+            try {
+                database.eliminarJob(jec.getTrigger().getKey());                
+                return;
+            } catch (SchedulerException ex) {
+                log.error(ex.getMessage(), ex);
+            }
+        }
+                
         log.info("**********************Aplicando intereses al prestamo: " + prestamo.getId());
-        
-        
+
         //calcular cuota
         double cuota = 0;
         
@@ -48,8 +60,7 @@ public class PrestamoJob implements Job {
         }
         
         log.info("***********************   Cuota aplicada: " + cuota);
-        
-        double interesesAcumulados = prestamo.getInteresAcumulado();        
+
         prestamo.setInteresAcumulado(interesesAcumulados + cuota);
         
         database.merge(prestamo);
