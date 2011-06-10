@@ -21,6 +21,7 @@
     <class>com.wiled.ubicame.prestamos.entidades.Prestamo</class>
     <class>com.wiled.ubicame.prestamos.entidades.Abono</class>
     <class>com.wiled.ubicame.prestamos.entidades.PagoInteres</class>
+    <class>com.wiled.ubicame.prestamos.entidades.Usuario</class>
     <properties>
       <property name="hibernate.connection.url" value="jdbc:hsqldb:mem:unit-testing-jpa;shutdown=true"/>
       <property name="hibernate.connection.driver_class" value="org.hsqldb.jdbcDriver"/>
