@@ -4,7 +4,7 @@
  */
 package com.wiled.ubicame.prestamos.datalayer;
 
-import com.wiled.ubicame.prestamo.utils.PrestamoConstants;
+import com.wiled.ubicame.prestamos.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.FormaPago;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
