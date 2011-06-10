@@ -41,7 +41,7 @@ public class PrestamoJob implements Job {
         
         if(interesesAcumulados == 0 && prestamo.getMonto() == 0) {
             try {
-                database.eliminarJob(jec.getTrigger().getKey());                
+                database.eliminarJob(jobDetail.getKey());                
                 return;
             } catch (SchedulerException ex) {
                 log.error(ex.getMessage(), ex);
