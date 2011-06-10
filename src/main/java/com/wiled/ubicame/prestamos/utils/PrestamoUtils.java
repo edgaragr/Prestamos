@@ -13,6 +13,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import javax.print.Doc;
+import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
+import javax.print.PrintException;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.SimpleDoc;
 
 /**
  *
@@ -88,5 +95,21 @@ public class PrestamoUtils {
         bw.write(toWrite);
         bw.close();
         br.close();
+    }
+    
+    public static void imprimirFactura(String factura) throws PrintException {
+        PrintService service = PrintServiceLookup.lookupDefaultPrintService();
+        if(service == null) throw new PrintException("No se encontro impresora conectada");
+        
+        //Le decimos el tipo de datos que vamos a enviar a la impresora
+        //Tipo: bytes Subtipo: autodetectado
+        DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
+        DocPrintJob pj = service.createPrintJob();
+        byte[] bytes;
+        bytes=factura.getBytes();
+        Doc doc=new SimpleDoc(bytes,flavor,null);
+
+        pj.print(doc, null);
+
     }
 }
