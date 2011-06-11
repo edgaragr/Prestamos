@@ -15,6 +15,7 @@ import com.wiled.ubicame.prestamos.entidades.FormaPago;
 import com.wiled.ubicame.prestamos.entidades.PagoInteres;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
 import com.wiled.ubicame.prestamos.schedules.PrestamoJob;
+import com.wiled.ubicame.prestamos.utils.PrestamoConstants;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -45,6 +46,7 @@ public class Controller {
     private static Controller controller;
     private Scheduler scheduler;
     private final Logger log;
+    private boolean testing;
     
     private Controller(String persistenceUnit) {
         emf = Persistence.createEntityManagerFactory(persistenceUnit);
@@ -59,9 +61,14 @@ public class Controller {
         }                
     }
 
-    public boolean validateUser(String user, char[] password) {
-        log.info("********************** Validando informacion de usuario: " + user + " y password: " + new String(password));
+    private Controller() {
+        emf = Persistence.createEntityManagerFactory(PrestamoConstants.TEST_PU);
+        em = emf.createEntityManager();
+        log = LoggerFactory.getLogger(Controller.class);     
+        testing = true;
+    }
         
+    public boolean validateUser(String user, char[] password) {        
         Query q = em.createNamedQuery("Usuario.buscarUsuario");
         q.setParameter("usuario", user);
         q.setParameter("password", new String(password));
@@ -79,6 +86,14 @@ public class Controller {
     public static Controller getInstance(String persistenceUnit) {
         if(controller == null) {
             controller = new Controller(persistenceUnit);
+        } 
+        
+        return controller;
+    }
+       
+    public static Controller getInstance() {
+        if(controller == null) {
+            controller = new Controller();
         } 
         
         return controller;
@@ -349,55 +364,57 @@ public class Controller {
         
         persist(prestamo);
                 
-        // Crear el scheduler para generar los cortes de este prestamo
-        JobDataMap map = new JobDataMap();
-        map.put(PrestamoJob.PRESTAMO, prestamo.getId());
-        
-        JobDetail job = newJob(PrestamoJob.class)
-                .withIdentity("job" + prestamo.getId(), "prestamos")
-                .usingJobData(map)
-                .requestRecovery()
-                .withDescription(prestamo.getComentario())
-                .build();
-        
-        Trigger trigger = null;
-        
-        switch (formaPago) {
-            case DIARIO:
-                trigger = newTrigger()
-                    .startAt(tomorrowAt(15, 0, 0))
-                    .withIdentity("trigger"+prestamo.getId(), "diarios")                    
-                    .withSchedule(simpleSchedule().withIntervalInHours(24).repeatForever())
-                    .build();
-                break;
-            case MENSUAL:                              
-                trigger = newTrigger()
-                    .withIdentity("trigger"+prestamo.getId(), "mensuales")
-                    .startAt(futureDate(30, IntervalUnit.DAY)) 
-                    .withSchedule(calendarIntervalSchedule()
-                        .withIntervalInMonths(1)) // interval is set in calendar months
-                    .build();
-                break;
-            case QUINCENAL:
-                trigger = newTrigger()
-                    .withIdentity("trigger"+prestamo.getId(), "quincenales")
-                    .startAt(futureDate(15, IntervalUnit.DAY)) 
-                    .withSchedule(calendarIntervalSchedule()
-                        .withIntervalInWeeks(2))
-                    .build();
-                break;
-            case SEMANAL:
-                trigger = newTrigger()
-                    .withIdentity("trigger"+prestamo.getId(), "quincenales")
-                    .startAt(futureDate(7, IntervalUnit.DAY))  
-                    .withSchedule(calendarIntervalSchedule()
-                        .withIntervalInWeeks(1))
-                    .build();
-                break;
-        }
+        if(!testing) {
+            // Crear el scheduler para generar los cortes de este prestamo
+            JobDataMap map = new JobDataMap();
+            map.put(PrestamoJob.PRESTAMO, prestamo.getId());
 
-        // Tell quartz to schedule the job using our trigger
-        scheduler.scheduleJob(job, trigger);
+            JobDetail job = newJob(PrestamoJob.class)
+                    .withIdentity("job" + prestamo.getId(), "prestamos")
+                    .usingJobData(map)
+                    .requestRecovery()
+                    .withDescription(prestamo.getComentario())
+                    .build();
+
+            Trigger trigger = null;
+
+            switch (formaPago) {
+                case DIARIO:
+                    trigger = newTrigger()
+                        .startAt(tomorrowAt(15, 0, 0))
+                        .withIdentity("trigger"+prestamo.getId(), "diarios")                    
+                        .withSchedule(simpleSchedule().withIntervalInHours(24).repeatForever())
+                        .build();
+                    break;
+                case MENSUAL:                              
+                    trigger = newTrigger()
+                        .withIdentity("trigger"+prestamo.getId(), "mensuales")
+                        .startAt(futureDate(30, IntervalUnit.DAY)) 
+                        .withSchedule(calendarIntervalSchedule()
+                            .withIntervalInMonths(1)) // interval is set in calendar months
+                        .build();
+                    break;
+                case QUINCENAL:
+                    trigger = newTrigger()
+                        .withIdentity("trigger"+prestamo.getId(), "quincenales")
+                        .startAt(futureDate(15, IntervalUnit.DAY)) 
+                        .withSchedule(calendarIntervalSchedule()
+                            .withIntervalInWeeks(2))
+                        .build();
+                    break;
+                case SEMANAL:
+                    trigger = newTrigger()
+                        .withIdentity("trigger"+prestamo.getId(), "quincenales")
+                        .startAt(futureDate(7, IntervalUnit.DAY))  
+                        .withSchedule(calendarIntervalSchedule()
+                            .withIntervalInWeeks(1))
+                        .build();
+                    break;
+            }
+
+            // Tell quartz to schedule the job using our trigger
+            scheduler.scheduleJob(job, trigger);
+        }
         
         if(prestamo.getId() != null)
             return prestamo;

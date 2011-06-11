@@ -19,7 +19,6 @@ public class PrestamoLoginService extends LoginService {
     
     @Override
     public boolean authenticate(String user, char[] password, String server) throws Exception {
-        log.info("********************** Verificando informacion para el usuario: " + user);
         Controller database = Controller.getInstance(PrestamoConstants.PROD_PU);
         return database.validateUser(user, password);
     }    

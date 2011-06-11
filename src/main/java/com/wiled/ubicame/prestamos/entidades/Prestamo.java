@@ -5,6 +5,7 @@
 package com.wiled.ubicame.prestamos.entidades;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -43,6 +44,10 @@ public class Prestamo implements Serializable {
     private List<Abono> abonos;
     private double interesAcumulado;
 
+    public Prestamo() {
+        abonos = new ArrayList<Abono>();
+    }
+    
     public FormaPago getFormaPago() {
         return formaPago;
     }

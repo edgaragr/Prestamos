@@ -44,7 +44,7 @@ public class PersistenceUnitTest extends TestCase {
         }
         try {
             logger.info("Building JPA EntityManager for unit tests");
-            instance = Controller.getInstance(PrestamoConstants.TEST_PU) ;
+            instance = Controller.getInstance() ;
         } catch (Exception ex) {
             fail("Exception during JPA EntityManager instanciation\n" + ex.getLocalizedMessage());
         }
@@ -71,7 +71,7 @@ public class PersistenceUnitTest extends TestCase {
     }
 
     public void testGetCuota() throws Exception {
-        double expResult = 0;
+        double expResult = 500;
         double cuota = instance.getCuota(prestamo);
         
         assertEquals(expResult, cuota);
@@ -121,7 +121,7 @@ public class PersistenceUnitTest extends TestCase {
     }
     
     public void testGetCapitalAdeudado() {
-        double expResult = 0;
+        double expResult = 9800;
         double capitalAdeudado = instance.getCapitalAdeudado(prestamo);
         
         assertEquals(expResult, capitalAdeudado);
