@@ -15,6 +15,7 @@ import com.wiled.ubicame.prestamos.utils.PrestamoException;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Abono;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
+import com.wiled.ubicame.prestamos.entidades.FormaPago;
 import com.wiled.ubicame.prestamos.entidades.Pago;
 import com.wiled.ubicame.prestamos.entidades.PagoInteres;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
@@ -26,10 +27,13 @@ import java.awt.event.KeyEvent;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.print.PrintException;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 import static com.wiled.ubicame.prestamos.utils.PrestamoUtils.*;
+import org.quartz.SchedulerException;
 /**
  *
  * @author edgar
@@ -39,14 +43,57 @@ public class PagoForm extends javax.swing.JDialog {
     private Frame jFrame;
     private Prestamo prestamo;
     private Controller controller;
-
+    private final String GUARDAR_CAMBIOS = "guardarCambios";
+    private final String NUEVO_PRESTAMO = "nuevoPrestamo";
+    private final String RENEGOCIAR = "renegociar";
+    
+    
     /** Creates new form PagoForm */
     public PagoForm(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        jFrame = parent;
+        jFrame = parent; 
     }
    
+    private void activarEstadoRenegociar(boolean encendido) {
+        crearPrestamoBtn.setText("RENEGOCIAR PRESTAMO");
+        crearPrestamoBtn.setActionCommand(RENEGOCIAR);
+        
+        if(encendido) {
+            fechaTxt.setEnabled(true);
+            fechaTxt.setEditable(true);
+
+            montoTxt.setEditable(true);
+            montoTxt.setEnabled(true);
+
+            formaPagoCBox.setEditable(true);
+            formaPagoCBox.setEnabled(true);
+
+            tasaTxt.setEditable(true);
+            tasaTxt.setEnabled(true);
+        } else {
+            fechaTxt.setEnabled(false);
+            fechaTxt.setEditable(false);
+
+            montoTxt.setEditable(false);
+            montoTxt.setEnabled(false);
+
+            formaPagoCBox.setEditable(false);
+            formaPagoCBox.setEnabled(false);
+
+            tasaTxt.setEditable(false);
+            tasaTxt.setEnabled(false);
+        }             
+
+    }
+    
+    private void activarEstadoCrearPrestamo() {
+        aplicarPagoBtn.setEnabled(false);
+        crearPrestamoBtn.setText("CREAR NUEVO PRESTAMO");
+        crearPrestamoBtn.setActionCommand(NUEVO_PRESTAMO);
+        crearPrestamoBtn.setVisible(true);
+    }
+    
     public PagoForm(java.awt.Frame parent, boolean modal, Cliente cliente) {
         super(parent, modal);
         initComponents();
@@ -68,8 +115,7 @@ public class PagoForm extends javax.swing.JDialog {
         montoTxt.setText(String.valueOf(prestamo.getMonto()));
         montoTxt.setEditable(false);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        fechaTxt.setText(sdf.format(prestamo.getFecha()));
+        fechaTxt.setDate(prestamo.getFecha());
         tasaTxt.setText(String.valueOf(prestamo.getTasa()));
         tasaTxt.setEditable(false);
 
@@ -133,12 +179,11 @@ public class PagoForm extends javax.swing.JDialog {
             }            
         });
         
-        crearPrestamoBtn.setVisible(false);
-
+        activarEstadoRenegociar(false);
+                
         if (prestamo.getInteresAcumulado() == 0 && prestamo.getMonto() == 0) {
             //Significa que el prestamo ya se pago
-            aplicarPagoBtn.setEnabled(false);
-            crearPrestamoBtn.setVisible(true);
+            activarEstadoCrearPrestamo();
         } else {
             try {
                 cuotaTxt.setText(String.valueOf(controller.amortizarPrestamo(prestamo.getMonto(), prestamo.getTasa())));
@@ -233,10 +278,10 @@ public class PagoForm extends javax.swing.JDialog {
         tasaTxt = new javax.swing.JTextField();
         nameLabel = new javax.swing.JLabel();
         administrarClienteBtn = new javax.swing.JButton();
-        fechaTxt = new javax.swing.JTextField();
         crearPrestamoBtn = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         cuotaTxt = new javax.swing.JTextField();
+        fechaTxt = new org.jdesktop.swingx.JXDatePicker();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Pagos");
@@ -350,10 +395,9 @@ public class PagoForm extends javax.swing.JDialog {
             }
         });
 
-        fechaTxt.setEditable(false);
-
         crearPrestamoBtn.setBackground(new java.awt.Color(255, 204, 204));
         crearPrestamoBtn.setText("CREAR NUEVO PRESTAMO");
+        crearPrestamoBtn.setActionCommand("crearNuevoPrestamo");
         crearPrestamoBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 crearPrestamoBtnActionPerformed(evt);
@@ -363,6 +407,8 @@ public class PagoForm extends javax.swing.JDialog {
         jLabel1.setText("Cuota:");
 
         cuotaTxt.setEditable(false);
+
+        fechaTxt.setEnabled(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -407,10 +453,10 @@ public class PagoForm extends javax.swing.JDialog {
                                         .addComponent(jLabel4)
                                         .addGap(4, 4, 4)
                                         .addComponent(formaPagoCBox, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(jLabel5)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(fechaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(fechaTxt, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE))))
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -580,12 +626,31 @@ public class PagoForm extends javax.swing.JDialog {
     }//GEN-LAST:event_aplicarPagoBtnActionPerformed
 
     private void crearPrestamoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crearPrestamoBtnActionPerformed
-        // TODO add your handling code here:
-        CrearPrestamo form = new CrearPrestamo(jFrame, true, cliente);
-        form.setLocationRelativeTo(null);
-        form.setVisible(true);
+        if(evt.getActionCommand().equalsIgnoreCase(RENEGOCIAR)) {
+            activarEstadoRenegociar(true);
+            
+            crearPrestamoBtn.setActionCommand(GUARDAR_CAMBIOS);
+            crearPrestamoBtn.setText("GUARDAR CAMBIOS");
+            
+        } else if(evt.getActionCommand().equalsIgnoreCase(NUEVO_PRESTAMO)){
+            CrearPrestamo form = new CrearPrestamo(jFrame, true, cliente);
+            form.setLocationRelativeTo(null);
+            form.setVisible(true);
 
-        dispose();
+            dispose();
+        } else if (evt.getActionCommand().equalsIgnoreCase(GUARDAR_CAMBIOS)) {
+            prestamo.setMonto(Double.valueOf(montoTxt.getText()));
+            prestamo.setFecha(fechaTxt.getDate());
+            prestamo.setFormaPago((FormaPago)formaPagoCBox.getSelectedItem());
+            prestamo.setTasa(Float.valueOf(tasaTxt.getText()));
+            
+            try {
+                controller.modificarPrestamo(prestamo);
+                activarEstadoRenegociar(false);
+            } catch (SchedulerException ex) {
+                JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "ERROR ELIMINANDO JOB", JOptionPane.ERROR_MESSAGE);                
+            }
+        }      
     }//GEN-LAST:event_crearPrestamoBtnActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField abonadoTxt;
@@ -594,7 +659,7 @@ public class PagoForm extends javax.swing.JDialog {
     private javax.swing.JButton crearPrestamoBtn;
     private javax.swing.JTextField cuotaTxt;
     private org.jdesktop.swingx.JXDatePicker datePicker;
-    private javax.swing.JTextField fechaTxt;
+    private org.jdesktop.swingx.JXDatePicker fechaTxt;
     private javax.swing.JComboBox formaPagoCBox;
     private javax.swing.JTextField interesesTxt;
     private javax.swing.JLabel jLabel1;

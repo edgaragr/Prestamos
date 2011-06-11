@@ -278,6 +278,21 @@ public class Controller {
         merge(p);                
     }
     
+    public void modificarPrestamo(Prestamo p) throws SchedulerException {
+        Prestamo actual = em.find(Prestamo.class, p.getId());
+        if(!actual.getFormaPago().equals(p.getFormaPago())) {
+            //Hay que eliminar el trigger
+            eliminarJob(new JobKey("job" + p.getId(), "prestamos"));
+        }
+        
+        actual.setMonto(p.getMonto());
+        actual.setFecha(p.getFecha());
+        actual.setFormaPago(p.getFormaPago());
+        actual.setTasa(p.getTasa());
+        
+        merge(actual);
+    }
+    
     public double getCuota(Prestamo p) throws Exception {
         double monto = p.getMonto();
         float tasa = p.getTasa();
@@ -316,9 +331,10 @@ public class Controller {
     }
     
     public Prestamo buscarPrestamo(Long id) {
-        Prestamo prestamo = em.find(Prestamo.class, id);                        
+        Prestamo prestamo = em.find(Prestamo.class, id);         
         return prestamo;
     }
+    
     
     public Prestamo crearPrestamo(Cliente cliente, String comentario, Date fecha, FormaPago formaPago, double monto, float tasa) throws PrestamoException, SchedulerException {
         if(monto < 0) throw new PrestamoException("Valor del 'monto' es menor que cero (0)");

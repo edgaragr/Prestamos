@@ -10,6 +10,10 @@
  */
 package com.wiled.ubicame.prestamos.forms;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jdesktop.swingx.JXLoginPane.Status;
 import org.jdesktop.swingx.auth.LoginService;
 import com.wiled.ubicame.prestamos.security.PrestamoLoginService;
@@ -25,6 +29,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFrame;
@@ -348,28 +353,47 @@ public class Application extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {        
-        final LoginService loginService = new PrestamoLoginService();        
+    public static void main(String args[]) {   
+        if(isSystemInstalled()) {
+            final LoginService loginService = new PrestamoLoginService();        
         
-        UIManager.put("JXLoginPane.banner.darkBackground", Color.ORANGE);
-        UIManager.put("JXLoginPane.banner.lightBackground", Color.ORANGE.brighter());
-        UIManager.put("JXLoginPane.banner.font", new Font("Arial", Font.ITALIC, 35));
-        UIManager.put("JXLoginPane.banner.foreground", Color.WHITE);
-                       
-        Status status = JXLoginPane.showLoginDialog(null, loginService);
-        
-        if(status == JXLoginPane.Status.SUCCEEDED) {
-            java.awt.EventQueue.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    Application a = new Application();
-                    a.setLocationRelativeTo(null);
-                    a.setVisible(true);
-                }
-            });
+            UIManager.put("JXLoginPane.banner.darkBackground", Color.ORANGE);
+            UIManager.put("JXLoginPane.banner.lightBackground", Color.ORANGE.brighter());
+            UIManager.put("JXLoginPane.banner.font", new Font("Arial", Font.ITALIC, 35));
+            UIManager.put("JXLoginPane.banner.foreground", Color.WHITE);
+
+            Status status = JXLoginPane.showLoginDialog(null, loginService);
+
+            if(status == JXLoginPane.Status.SUCCEEDED) {
+                java.awt.EventQueue.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        Application a = new Application();
+                        a.setLocationRelativeTo(null);
+                        a.setVisible(true);
+                    }
+                });
+            } else {
+                System.exit(0);
+            }
         } else {
-            System.exit(0);
+            JOptionPane.showMessageDialog(null, "No se pudo detectar la base de datos", "Error de Inicializacion", JOptionPane.ERROR_MESSAGE);
+            System.exit(0);            
+        }        
+    }
+    
+    private static boolean isSystemInstalled() {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection c = DriverManager.getConnection("jdbc:mysql://localhost:3306/prestamos", "root", "wiled");            
+            if(c.isValid(0)) return true;
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        return false;
     }
     
     private class ResultTableModel extends AbstractTableModel {
