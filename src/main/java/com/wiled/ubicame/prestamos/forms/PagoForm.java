@@ -27,8 +27,6 @@ import java.awt.event.KeyEvent;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.print.PrintException;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
@@ -606,22 +604,26 @@ public class PagoForm extends javax.swing.JDialog {
         if (pagoAplicado) {
             reloadPagoTable();
             
-            StringBuilder sb = new StringBuilder();
-            sb.append("Sistema de Prestamos\n");
-            sb.append("--------------------\n\n");
-            sb.append("Cliente: ").append(prestamo.getCliente()).append("\n");
-            sb.append("Monto Pagado: RD$").append(montoPagoTxt.getText()).append("\n");
-            sb.append("Concepto: ").append(concepto).append("\n");
+            int confirmation = JOptionPane.showConfirmDialog(rootPane, "Desea imprimir una factura ?", "IMPRESION DE FACTURA", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            sb.append("Fecha: ").append(sdf.format(datePicker.getDate())).append("\n\n\n\n\n");
-            sb.append("--------------------\n");
-            sb.append("      Firma");
-            try {
-                imprimirFactura(sb.toString());
-            } catch (PrintException ex) {
-                JOptionPane.showMessageDialog(jFrame, ex.getMessage(), "ERROR IMPRIMIENDO FACTURA", JOptionPane.ERROR_MESSAGE);
-            }
+            if(confirmation == JOptionPane.YES_OPTION) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Sistema de Prestamos\n");
+                sb.append("--------------------\n\n");
+                sb.append("Cliente: ").append(prestamo.getCliente()).append("\n");
+                sb.append("Monto Pagado: RD$").append(montoPagoTxt.getText()).append("\n");
+                sb.append("Concepto: ").append(concepto).append("\n");
+
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                sb.append("Fecha: ").append(sdf.format(datePicker.getDate())).append("\n\n\n\n\n");
+                sb.append("--------------------\n");
+                sb.append("      Firma");
+                try {
+                    imprimirFactura(sb.toString());
+                } catch (PrintException ex) {
+                    JOptionPane.showMessageDialog(jFrame, ex.getMessage(), "ERROR IMPRIMIENDO FACTURA", JOptionPane.ERROR_MESSAGE);
+                }
+            }           
         }
     }//GEN-LAST:event_aplicarPagoBtnActionPerformed
 
