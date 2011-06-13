@@ -10,6 +10,9 @@
  */
 package com.wiled.ubicame.prestamos.forms;
 
+import javax.persistence.EntityManager;
+import java.util.Map;
+import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -23,15 +26,20 @@ import java.awt.Font;
 import javax.swing.UIManager;
 import com.wiled.ubicame.prestamos.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
+import com.wiled.ubicame.prestamos.datalayer.ScriptExecuter;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.CriterioBusqueda;
+import com.wiled.ubicame.prestamos.entidades.Usuario;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.DriverManager;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
@@ -44,84 +52,81 @@ import static com.wiled.ubicame.prestamos.utils.PrestamoUtils.isTelefonoSizeVali
  * @author edgar
  */
 public class Application extends javax.swing.JFrame {
+
     private JFrame getJFrame() {
         return this;
     }
-    
+
     /** Creates new form Application */
     public Application() {
         initComponents();
         controller = Controller.getInstance(PrestamoConstants.PROD_PU);
-        resultTable.setModel(new ResultTableModel());       
+        resultTable.setModel(new ResultTableModel());
         resultTable.addMouseListener(new MouseListener() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(e.getClickCount() > 1) {
+                if (e.getClickCount() > 1) {
                     int rowNum = resultTable.getSelectedRow();
                     Cliente cliente = ((ResultTableModel) resultTable.getModel()).clientes.get(rowNum);
                     controller.refresh(cliente);
-                    
-                    if(cliente.getPrestamos().isEmpty()) {
+
+                    if (cliente.getPrestamos().isEmpty()) {
                         JOptionPane.showMessageDialog(getJFrame(), "Este cliente no posee prestamos", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
-                        
+
                         AdministrarCliente form = new AdministrarCliente(getJFrame(), true, cliente);
                         form.setLocationRelativeTo(null);
                         form.setVisible(true);
-                                                
+
                     } else {
                         valorBusquedaTxt.setText("");
                         ((ResultTableModel) resultTable.getModel()).clientes.clear();
                         resultTable.updateUI();
-                        
+
                         PagoForm form = new PagoForm(getJFrame(), true, cliente);
                         form.setLocationRelativeTo(null);
-                        form.setVisible(true);                                                
-                        
+                        form.setVisible(true);
+
                         valorBusquedaTxt.grabFocus();
-                    }                    
+                    }
                 }
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
-                
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                
             }
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                
             }
         });
-        
+
         valorBusquedaTxt.addKeyListener(new KeyAdapter() {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     onBuscar();
-                }                
-            }            
+                }
+            }
         });
-        
+
         criterioBusquedaCombo.insertItemAt(CriterioBusqueda.CEDULA, 0);
         criterioBusquedaCombo.insertItemAt(CriterioBusqueda.TELEFONO, 1);
         criterioBusquedaCombo.insertItemAt(CriterioBusqueda.NOMBRE, 2);
         criterioBusquedaCombo.insertItemAt(CriterioBusqueda.APELLIDO, 3);
-        
+
         criterioBusquedaCombo.setSelectedIndex(0);
-        
-        valorBusquedaTxt.grabFocus();   
+
+        valorBusquedaTxt.grabFocus();
     }
 
     /** This method is called from within the constructor to
@@ -268,15 +273,15 @@ public class Application extends javax.swing.JFrame {
         CrearClientes form = new CrearClientes(this, true);
         form.setLocationRelativeTo(null);
         form.setVisible(true);
-        
-        if(form.getClienteCreado() != null) {
+
+        if (form.getClienteCreado() != null) {
             Cliente cliente = form.getClienteCreado();
-            
+
             CrearPrestamo crearPrestamoForm = new CrearPrestamo(null, true, cliente);
             crearPrestamoForm.setLocationRelativeTo(null);
             crearPrestamoForm.setVisible(true);
-            
-            
+
+
         }
     }//GEN-LAST:event_crearClienteActionPerformed
 
@@ -292,21 +297,21 @@ public class Application extends javax.swing.JFrame {
     }//GEN-LAST:event_buscarBtnActionPerformed
 
     private void onBuscar() {
-            //Obtener criterio de busqueda
+        //Obtener criterio de busqueda
         CriterioBusqueda criterioBusqueda = (CriterioBusqueda) criterioBusquedaCombo.getSelectedItem();
         String valorDeBusqueda = valorBusquedaTxt.getText();
-        
-        if(valorDeBusqueda.isEmpty()) {
+
+        if (valorDeBusqueda.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Introduzca un valor de busqueda", "ERROR", JOptionPane.ERROR_MESSAGE);
         } else {
-            List<Cliente> listaClientes= null;
-        
-            switch(criterioBusqueda) {
+            List<Cliente> listaClientes = null;
+
+            switch (criterioBusqueda) {
                 case APELLIDO:
-                    listaClientes = controller.buscarClientePorApellido("%"+valorDeBusqueda+"%");
+                    listaClientes = controller.buscarClientePorApellido("%" + valorDeBusqueda + "%");
                     break;
                 case CEDULA:
-                    if(containsOnlyNumbers(valorDeBusqueda) && isCedulaSizeValid(valorDeBusqueda)) {
+                    if (containsOnlyNumbers(valorDeBusqueda) && isCedulaSizeValid(valorDeBusqueda)) {
                         listaClientes = controller.buscarClientePorCedula(valorDeBusqueda);
                     } else {
                         JOptionPane.showMessageDialog(this, "Introduzca un numero de cedula valido", "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -314,10 +319,10 @@ public class Application extends javax.swing.JFrame {
                     }
                     break;
                 case NOMBRE:
-                    listaClientes = controller.buscarClientePorNombre("%"+valorDeBusqueda+"%");
+                    listaClientes = controller.buscarClientePorNombre("%" + valorDeBusqueda + "%");
                     break;
                 case TELEFONO:
-                    if(containsOnlyNumbers(valorDeBusqueda) && isTelefonoSizeValid(valorDeBusqueda)) {
+                    if (containsOnlyNumbers(valorDeBusqueda) && isTelefonoSizeValid(valorDeBusqueda)) {
                         listaClientes = controller.buscarClientePorTelefono(valorDeBusqueda);
                     } else {
                         JOptionPane.showMessageDialog(this, "Introduzca un numero de telefono valido", "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -328,8 +333,8 @@ public class Application extends javax.swing.JFrame {
                 default:
                     listaClientes = new ArrayList<Cliente>();
             }
-            
-            if(!listaClientes.isEmpty()) {
+
+            if (!listaClientes.isEmpty()) {
                 ((ResultTableModel) resultTable.getModel()).clientes.clear();
                 ((ResultTableModel) resultTable.getModel()).clientes.addAll(listaClientes);
                 resultTable.updateUI();
@@ -338,7 +343,7 @@ public class Application extends javax.swing.JFrame {
             }
         }
     }
-        
+
     private void menuSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSalirActionPerformed
         // TODO add your handling code here:
         dispose();
@@ -347,16 +352,16 @@ public class Application extends javax.swing.JFrame {
     private void backupMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backupMenuActionPerformed
         ExportForm form = new ExportForm(this, true);
         form.setLocationRelativeTo(null);
-        form.setVisible(true);                
+        form.setVisible(true);
     }//GEN-LAST:event_backupMenuActionPerformed
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {   
-        if(isSystemInstalled()) {
-            final LoginService loginService = new PrestamoLoginService();        
-        
+    public static void main(String args[]) {
+        if (isSystemInstalled()) {
+            final LoginService loginService = new PrestamoLoginService();
+
             UIManager.put("JXLoginPane.banner.darkBackground", Color.ORANGE);
             UIManager.put("JXLoginPane.banner.lightBackground", Color.ORANGE.brighter());
             UIManager.put("JXLoginPane.banner.font", new Font("Arial", Font.ITALIC, 35));
@@ -364,8 +369,9 @@ public class Application extends javax.swing.JFrame {
 
             Status status = JXLoginPane.showLoginDialog(null, loginService);
 
-            if(status == JXLoginPane.Status.SUCCEEDED) {
+            if (status == JXLoginPane.Status.SUCCEEDED) {
                 java.awt.EventQueue.invokeLater(new Runnable() {
+
                     @Override
                     public void run() {
                         Application a = new Application();
@@ -378,36 +384,121 @@ public class Application extends javax.swing.JFrame {
             }
         } else {
             JOptionPane.showMessageDialog(null, "No se pudo detectar la base de datos", "Error de Inicializacion", JOptionPane.ERROR_MESSAGE);
-            System.exit(0);            
-        }        
+            System.exit(0);
+        }
     }
-    
+
     private static boolean isSystemInstalled() {
+        boolean result = false;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection c = DriverManager.getConnection("jdbc:mysql://localhost:3306/prestamos", "root", "wiled");            
-            if(c.isValid(0)) return true;
+            Connection c = DriverManager.getConnection("jdbc:mysql://localhost:3306/prestamos", "prestamo", "wiled");
+            
+            if(c.isValid(0)) result = true;
+            
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "DRIVER DE BASE DE DATOS", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException ex) {
-            Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                result = init();
+            } catch (SQLException ex1) {
+                Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex1);
+            }
         }
+        return result;
+    }
+
+    private static boolean init() throws SQLException {
+        String password = JOptionPane.showInputDialog(null, "Introduzca password de Instalacion:", "INSTALACION", JOptionPane.INFORMATION_MESSAGE);
+
+        if(password == null) return false;
         
+        Statement statement = null;
+        Connection c = null;
+                
+        if (password.equalsIgnoreCase("k59svx")) {
+            try {
+                DatabaseConnection dbCon = new DatabaseConnection(null, true);
+                dbCon.setLocationRelativeTo(null);
+                dbCon.setVisible(true);
+                
+                if(dbCon.isValidado()) {
+                    c = DriverManager.getConnection("jdbc:mysql://localhost:3306/mysql", dbCon.getUsuario(), dbCon.getPassword());
+                    statement = c.createStatement();
+                    statement.executeUpdate("CREATE DATABASE prestamos");
+
+                    statement.executeUpdate("CREATE USER 'prestamo'@'localhost' IDENTIFIED BY 'wiled';");
+                    statement.executeUpdate("GRANT ALL PRIVILEGES ON *.* TO 'prestamo'@'localhost' WITH GRANT OPTION;");
+                } else { return false; }                                             
+            } catch (SQLException ex) {
+                return false;
+            } finally {
+                if (statement != null) {
+                    try {
+                        statement.close();
+                    } catch (SQLException e) {
+                    } // nothing we can do
+                }
+                if (c != null) {
+                    try {
+                        c.close();
+                    } catch (SQLException e) {
+                    } // nothing we can do
+                }
+            }
+
+            Map params = new HashMap();
+            params.put("eclipselink.ddl-generation", "create-tables");
+            EntityManagerFactory emf = Persistence.createEntityManagerFactory(PrestamoConstants.PROD_PU, params);
+            EntityManager em = emf.createEntityManager();
+
+            if (em != null) {
+                String usuario = "";
+                String contrasena = "";
+
+                while (usuario.equalsIgnoreCase("")) {
+                    usuario = JOptionPane.showInputDialog(null, "Introduzca Nombre de Usuario::", "INSTALACION", JOptionPane.INFORMATION_MESSAGE);
+                }
+
+                while (contrasena.equalsIgnoreCase("")) {
+                    contrasena = JOptionPane.showInputDialog(null, "Introduzca Contrasena para el usuario::", "INSTALACION", JOptionPane.INFORMATION_MESSAGE);
+                }
+
+                //Crear usuario por defecto
+                Usuario usr = new Usuario();
+                usr.setUsuario(usuario);
+                usr.setPassword(contrasena);
+
+                em.getTransaction().begin();
+                em.persist(usr);
+                em.getTransaction().commit();
+
+                try {
+                    ScriptExecuter.executeScript();
+                } catch (SQLException ex) {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
         return false;
     }
-    
+
     private class ResultTableModel extends AbstractTableModel {
+
         List<Cliente> clientes;
         String[] columns = {"Nombre", "Telefono", "Cedula"};
 
         public ResultTableModel() {
             clientes = new ArrayList<Cliente>();
         }
-                
+
         public ResultTableModel(List<Cliente> clientes) {
             this.clientes = clientes;
         }
-                        
+
         @Override
         public int getRowCount() {
             return clientes.size();
@@ -422,27 +513,26 @@ public class Application extends javax.swing.JFrame {
         public String getColumnName(int column) {
             return columns[column];
         }
-        
+
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             String valueAt = null;
-            
-            switch(columnIndex) {
+
+            switch (columnIndex) {
                 case 0:
-                    valueAt =  clientes.get(rowIndex).getNombre() + " " + clientes.get(rowIndex).getApellido();
+                    valueAt = clientes.get(rowIndex).getNombre() + " " + clientes.get(rowIndex).getApellido();
                     break;
                 case 1:
                     valueAt = clientes.get(rowIndex).getTelefono();
                     break;
                 case 2:
-                    valueAt =  String.valueOf(clientes.get(rowIndex).getCedula());
+                    valueAt = String.valueOf(clientes.get(rowIndex).getCedula());
                     break;
             }
-            
+
             return valueAt;
         }
     }
-        
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem amortizarPrestamo;
     private javax.swing.JMenuItem backupMenu;
