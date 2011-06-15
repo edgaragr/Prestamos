@@ -392,7 +392,8 @@ public class Application extends javax.swing.JFrame {
         boolean result = false;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection c = DriverManager.getConnection("jdbc:mysql://localhost:3306/prestamos", "prestamo", "wiled");
+            Connection c = DriverManager.getConnection("jdbc:mysql://localhost:3306/"+PrestamoConstants.SYSTEM_DATABASE_NAME+"", 
+                    PrestamoConstants.SYSTEM_USER, PrestamoConstants.SYSTEM_PASSWORD);
             
             if(c.isValid(0)) result = true;
             
@@ -425,10 +426,10 @@ public class Application extends javax.swing.JFrame {
                 if(dbCon.isValidado()) {
                     c = DriverManager.getConnection("jdbc:mysql://localhost:3306/mysql", dbCon.getUsuario(), dbCon.getPassword());
                     statement = c.createStatement();
-                    statement.executeUpdate("CREATE DATABASE prestamos");
+                    statement.executeUpdate("CREATE DATABASE "+ PrestamoConstants.SYSTEM_DATABASE_NAME+"");
 
-                    statement.executeUpdate("CREATE USER 'prestamo'@'localhost' IDENTIFIED BY 'wiled';");
-                    statement.executeUpdate("GRANT ALL PRIVILEGES ON *.* TO 'prestamo'@'localhost' WITH GRANT OPTION;");
+                    statement.executeUpdate("CREATE USER '"+PrestamoConstants.SYSTEM_USER+"'@'localhost' IDENTIFIED BY '"+PrestamoConstants.SYSTEM_PASSWORD+"';");
+                    statement.executeUpdate("GRANT ALL PRIVILEGES ON *.* TO '"+PrestamoConstants.SYSTEM_USER+"'@'localhost' WITH GRANT OPTION;");
                 } else { return false; }                                             
             } catch (SQLException ex) {
                 return false;

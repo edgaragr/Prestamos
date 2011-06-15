@@ -8,6 +8,7 @@ package com.wiled.ubicame.prestamos.datalayer;
  *
  * @author Edgar Garcia
  */
+import com.wiled.ubicame.prestamos.utils.PrestamoConstants;
 import java.io.BufferedReader;
 
 import java.io.InputStream;
@@ -34,12 +35,12 @@ public class ScriptExecuter {
             System.out.println("*** Error : ");
         }
     }
-    private static final String URL = "jdbc:mysql://localhost:3306/prestamos";
-    private static final String USER = "root";
-    private static final String PASSWORD = "wiled";
+    private static final String URL = "jdbc:mysql://localhost:3306/"+PrestamoConstants.SYSTEM_DATABASE_NAME+"";
+    //private static final String USER = "root";
+    //private static final String PASSWORD = "wiled";
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+        return DriverManager.getConnection(URL, PrestamoConstants.SYSTEM_USER, PrestamoConstants.SYSTEM_PASSWORD);
     }
     
     public static void main(String[] args) {
