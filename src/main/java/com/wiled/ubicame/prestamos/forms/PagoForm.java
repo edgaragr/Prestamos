@@ -20,6 +20,7 @@ import com.wiled.ubicame.prestamos.entidades.Pago;
 import com.wiled.ubicame.prestamos.entidades.PagoInteres;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
 import com.wiled.ubicame.prestamos.entidades.TipoPago;
+import com.wiled.ubicame.prestamos.utils.PrestamoUtils;
 import java.awt.Color;
 import java.awt.Frame;
 import java.awt.event.KeyAdapter;
@@ -97,6 +98,8 @@ public class PagoForm extends javax.swing.JDialog {
         initComponents();
         this.cliente = cliente;
         jFrame = parent;
+                    
+        datePicker.setDate(PrestamoUtils.getCurrentDate());
         
         controller = Controller.getInstance(PrestamoConstants.PROD_PU);
         tipoPagoCBox.insertItemAt(TipoPago.ABONO, 0);
@@ -294,16 +297,19 @@ public class PagoForm extends javax.swing.JDialog {
         jLabel2.setText("Monto:");
 
         montoTxt.setEditable(false);
+        montoTxt.setDisabledTextColor(new java.awt.Color(31, 86, 31));
 
         jLabel3.setText("Tasa:");
 
         jLabel6.setText("Intereses Acumulados:");
 
         interesesTxt.setEditable(false);
+        interesesTxt.setDisabledTextColor(new java.awt.Color(31, 86, 31));
 
         jLabel7.setText("Abonado:");
 
         abonadoTxt.setEditable(false);
+        abonadoTxt.setDisabledTextColor(new java.awt.Color(31, 86, 31));
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Detalles de Pago"));
 
@@ -344,7 +350,7 @@ public class PagoForm extends javax.swing.JDialog {
                 .addComponent(jLabel11)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tipoPagoCBox, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
                 .addComponent(aplicarPagoBtn)
                 .addContainerGap())
         );
@@ -380,6 +386,7 @@ public class PagoForm extends javax.swing.JDialog {
         pagosTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
         tasaTxt.setEditable(false);
+        tasaTxt.setDisabledTextColor(new java.awt.Color(31, 86, 31));
 
         nameLabel.setFont(new java.awt.Font("Tahoma", 1, 11));
         nameLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -405,6 +412,7 @@ public class PagoForm extends javax.swing.JDialog {
         jLabel1.setText("Cuota:");
 
         cuotaTxt.setEditable(false);
+        cuotaTxt.setDisabledTextColor(new java.awt.Color(31, 86, 31));
 
         fechaTxt.setEnabled(false);
 

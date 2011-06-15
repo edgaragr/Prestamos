@@ -16,6 +16,8 @@ import com.wiled.ubicame.prestamos.datalayer.Controller;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.FormaPago;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
+import com.wiled.ubicame.prestamos.utils.PrestamoUtils;
+import java.util.Calendar;
 import java.util.Date;
 import javax.swing.JOptionPane;
 import org.quartz.SchedulerException;
@@ -36,9 +38,11 @@ public class CrearPrestamo extends javax.swing.JDialog {
         nombreLbl.setText(cliente.toString());
         
         formaPagoCombo.insertItemAt(FormaPago.DIARIO, 0);
-        formaPagoCombo.insertItemAt(FormaPago.MENSUAL, 1);
+        formaPagoCombo.insertItemAt(FormaPago.SEMANAL, 1);
         formaPagoCombo.insertItemAt(FormaPago.QUINCENAL, 2);
-        formaPagoCombo.insertItemAt(FormaPago.SEMANAL, 3);
+        formaPagoCombo.insertItemAt(FormaPago.MENSUAL, 3);
+                      
+        fechaDatePicker.setDate(PrestamoUtils.getCurrentDate());
     }
 
     /** This method is called from within the constructor to
@@ -227,7 +231,7 @@ public class CrearPrestamo extends javax.swing.JDialog {
         double monto = Double.valueOf(montoTxt.getText());
         float tasa = Float.valueOf(tasaTxt.getText());        
 
-        try {
+        try {            
             Prestamo creado  = controller.crearPrestamo(cliente, comentario, fecha, formaPago, monto, tasa);
             
             if(!interesesTxt.getText().isEmpty()) {

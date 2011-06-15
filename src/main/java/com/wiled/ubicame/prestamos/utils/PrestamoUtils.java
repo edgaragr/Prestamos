@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import javax.print.Doc;
 import javax.print.DocFlavor;
 import javax.print.DocPrintJob;
@@ -64,14 +65,19 @@ public class PrestamoUtils {
         return false;
     }
 
-    private static String getCurrentDate() {
-        Calendar c = Calendar.getInstance();
+    private static String getCurrentDateAsString() {
+        Date c = getCurrentDate();
         SimpleDateFormat sdf = new SimpleDateFormat("-dd-MM-yyyy");
         return sdf.format(c.getTime());
     }
+    
+    public static Date getCurrentDate() {
+        Calendar c = Calendar.getInstance();
+        return c.getTime();
+    }
 
     public static void exportDataBase(String drive) throws IOException {
-        String path = ""+drive+"backup" + getCurrentDate() + ".sql";
+        String path = ""+drive+"backup" + getCurrentDateAsString() + ".sql";
         String dumpCommand = "mysqldump -uroot -pwiled prestamos -r " + path;
         File tst = new File(path);
         FileWriter fw = null;

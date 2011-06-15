@@ -156,6 +156,9 @@
     <Component class="javax.swing.JFormattedTextField" name="montoTxt">
       <Properties>
         <Property name="editable" type="boolean" value="false"/>
+        <Property name="disabledTextColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="1f" green="56" red="1f" type="rgb"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel3">
@@ -171,6 +174,9 @@
     <Component class="javax.swing.JTextField" name="interesesTxt">
       <Properties>
         <Property name="editable" type="boolean" value="false"/>
+        <Property name="disabledTextColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="1f" green="56" red="1f" type="rgb"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel7">
@@ -181,6 +187,9 @@
     <Component class="javax.swing.JTextField" name="abonadoTxt">
       <Properties>
         <Property name="editable" type="boolean" value="false"/>
+        <Property name="disabledTextColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="1f" green="56" red="1f" type="rgb"/>
+        </Property>
       </Properties>
     </Component>
     <Container class="javax.swing.JPanel" name="jPanel1">
@@ -333,6 +342,9 @@
     <Component class="javax.swing.JTextField" name="tasaTxt">
       <Properties>
         <Property name="editable" type="boolean" value="false"/>
+        <Property name="disabledTextColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="1f" green="56" red="1f" type="rgb"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="nameLabel">
@@ -375,6 +387,9 @@
     <Component class="javax.swing.JTextField" name="cuotaTxt">
       <Properties>
         <Property name="editable" type="boolean" value="false"/>
+        <Property name="disabledTextColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="1f" green="56" red="1f" type="rgb"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="org.jdesktop.swingx.JXDatePicker" name="fechaTxt">
