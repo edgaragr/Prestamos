@@ -50,7 +50,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="nameLabel" pref="403" max="32767" attributes="0"/>
+                              <Component id="nameLabel" pref="444" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="administrarClienteBtn" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -63,20 +63,20 @@
                                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="cuotaTxt" pref="67" max="32767" attributes="0"/>
+                                      <Component id="cuotaTxt" pref="99" max="32767" attributes="0"/>
                                   </Group>
                                   <Group type="102" alignment="0" attributes="1">
                                       <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
                                       <Component id="formaPagoCBox" min="-2" pref="165" max="-2" attributes="1"/>
-                                      <EmptySpace max="32767" attributes="0"/>
+                                      <EmptySpace pref="36" max="32767" attributes="0"/>
                                       <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="verEditarComentarioBtn" pref="235" max="32767" attributes="0"/>
-                                  <Component id="fechaTxt" alignment="0" pref="235" max="32767" attributes="0"/>
+                                  <Component id="verEditarComentarioBtn" pref="268" max="32767" attributes="0"/>
+                                  <Component id="fechaTxt" alignment="0" pref="268" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -223,7 +223,7 @@
                   <Component id="jLabel11" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="tipoPagoCBox" min="-2" pref="123" max="-2" attributes="0"/>
-                  <EmptySpace pref="36" max="32767" attributes="0"/>
+                  <EmptySpace pref="144" max="32767" attributes="0"/>
                   <Component id="aplicarPagoBtn" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>

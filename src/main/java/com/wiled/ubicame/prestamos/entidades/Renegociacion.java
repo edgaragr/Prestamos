@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 
 /**
@@ -21,7 +22,8 @@ import javax.persistence.Temporal;
 public class Renegociacion implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+@GeneratedValue(strategy = GenerationType.TABLE, generator = "Renegociacion")
+    @TableGenerator(name = "Renegociacion", table = "HIBERNATE_SEQUENCES", allocationSize = 1, initialValue = 0, pkColumnName = "SEQUENCE_NAME", valueColumnName = "SEQUENCE_NEXT_HI_VALUE", pkColumnValue = "Renegociacion")
     private Long id;
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date fecha;

@@ -220,43 +220,15 @@ public class Controller {
         p.getAbonos().add(abono);
         
         merge(p);
-        
-        //renegociarPrestamo(p);
+
         return true;
     }
-    
-    /*public void renegociarPrestamo(Prestamo p) {
-        refresh(p);                
-        double ultimoAbono = 0;
-        
-        if(!p.getAbonos().isEmpty()) {
-            ultimoAbono = p.getAbonos().get(p.getAbonos().size() - 1).getMonto();
-        }
-       
-        double montoPrestado = p.getMonto();
-        double nuevoBalance = montoPrestado - ultimoAbono;
-        
-        p.setMonto(nuevoBalance);
-        
-        merge(p);                
-    }*/
-    
-    public void modificarPrestamo(Prestamo p) throws SchedulerException {
-        //Crear una renegociacion
-        Renegociacion renegociacion = new Renegociacion();
-        renegociacion.setPrestamo(p);
-        renegociacion.setFecha(PrestamoUtils.getCurrentDate());       
-        
-        Prestamo actual = em.find(Prestamo.class, p.getId());
-        double montoAgregado = p.getMonto() - actual.getMonto();
-        renegociacion.setMontoAgregado(montoAgregado);
-        
-        float nuevaTasa = p.getTasa() - actual.getTasa();
-        renegociacion.setNuevaTasa(nuevaTasa);        
-        renegociacion.setNuevaFormaPago(p.getFormaPago());
-                
+
+    public void modificarPrestamo(Renegociacion renegociacion) throws SchedulerException {
+        //Crear una renegociacion                
         persist(renegociacion);
         
+        Prestamo actual = renegociacion.getPrestamo();
         actual.getRenegociaciones().add(renegociacion);        
         merge(actual);
     }

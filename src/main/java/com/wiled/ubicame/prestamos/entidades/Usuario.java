@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
+import javax.persistence.TableGenerator;
 
 /**
  *
@@ -20,7 +21,8 @@ import javax.persistence.NamedQuery;
 public class Usuario implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+@GeneratedValue(strategy = GenerationType.TABLE, generator = "Usuario")
+    @TableGenerator(name = "Usuario", table = "HIBERNATE_SEQUENCES", allocationSize = 1, initialValue = 0, pkColumnName = "SEQUENCE_NAME", valueColumnName = "SEQUENCE_NEXT_HI_VALUE", pkColumnValue = "Usuario")
     private Long id;
     private String usuario;
     private String password;

@@ -17,6 +17,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 
 /**
@@ -25,9 +26,11 @@ import javax.persistence.Temporal;
  */
 @Entity
 public class Prestamo implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "Prestamo")
+    @TableGenerator(name = "Prestamo", table = "HIBERNATE_SEQUENCES", allocationSize = 1, initialValue = 0, pkColumnName = "SEQUENCE_NAME", valueColumnName = "SEQUENCE_NEXT_HI_VALUE", pkColumnValue = "Prestamo")
     private Long id;
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date fecha;
@@ -35,14 +38,14 @@ public class Prestamo implements Serializable {
     private String comentario;
     private float tasa;
     @Enumerated(EnumType.STRING)
-    private FormaPago formaPago;    
+    private FormaPago formaPago;
     @ManyToOne
-    private Cliente cliente;       
-    @OneToMany(mappedBy = "prestamo", cascade= CascadeType.ALL)
-    private List<PagoInteres> pagos;    
-    @OneToMany(mappedBy = "prestamo", cascade= CascadeType.ALL)
+    private Cliente cliente;
+    @OneToMany(mappedBy = "prestamo", cascade = CascadeType.ALL)
+    private List<PagoInteres> pagos;
+    @OneToMany(mappedBy = "prestamo", cascade = CascadeType.ALL)
     private List<Abono> abonos;
-    @OneToMany(mappedBy = "prestamo")
+    @OneToMany(mappedBy = "prestamo", cascade = CascadeType.ALL)
     private List<Renegociacion> renegociaciones;
 
     public List<Renegociacion> getRenegociaciones() {
@@ -52,13 +55,13 @@ public class Prestamo implements Serializable {
     public void setRenegociaciones(List<Renegociacion> renegociaciones) {
         this.renegociaciones = renegociaciones;
     }
-    
+
     public Prestamo() {
         abonos = new ArrayList<Abono>();
         pagos = new ArrayList<PagoInteres>();
         renegociaciones = new ArrayList<Renegociacion>();
     }
-    
+
     public FormaPago getFormaPago() {
         return formaPago;
     }
@@ -66,7 +69,7 @@ public class Prestamo implements Serializable {
     public void setFormaPago(FormaPago formaPago) {
         this.formaPago = formaPago;
     }
-    
+
     public Cliente getCliente() {
         return cliente;
     }
@@ -74,7 +77,7 @@ public class Prestamo implements Serializable {
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
-    
+
     public List<Abono> getAbonos() {
         return abonos;
     }
@@ -82,7 +85,7 @@ public class Prestamo implements Serializable {
     public void setAbonos(List<Abono> abonos) {
         this.abonos = abonos;
     }
-        
+
     public List<PagoInteres> getPagos() {
         return pagos;
     }
@@ -90,7 +93,7 @@ public class Prestamo implements Serializable {
     public void setPagos(List<PagoInteres> pagos) {
         this.pagos = pagos;
     }
-        
+
     public String getComentario() {
         return comentario;
     }
@@ -122,7 +125,7 @@ public class Prestamo implements Serializable {
     public void setTasa(float tasa) {
         this.tasa = tasa;
     }
-        
+
     public Long getId() {
         return id;
     }
@@ -155,5 +158,4 @@ public class Prestamo implements Serializable {
     public String toString() {
         return "com.wiled.ubicame.prestamos.entidades.Prestamo[ id=" + id + " ]";
     }
-    
 }

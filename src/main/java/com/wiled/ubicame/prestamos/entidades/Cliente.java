@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.TableGenerator;
 
 /**
  *
@@ -31,7 +32,8 @@ import javax.persistence.OneToMany;
 public class Cliente implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+@GeneratedValue(strategy = GenerationType.TABLE, generator = "Cliente")
+    @TableGenerator(name = "Cliente", table = "HIBERNATE_SEQUENCES", allocationSize = 1, initialValue = 0, pkColumnName = "SEQUENCE_NAME", valueColumnName = "SEQUENCE_NEXT_HI_VALUE", pkColumnValue = "Cliente")
     private Long id;
     private String nombre;
     private String apellido;

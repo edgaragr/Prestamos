@@ -19,6 +19,7 @@ import com.wiled.ubicame.prestamos.entidades.FormaPago;
 import com.wiled.ubicame.prestamos.entidades.Pago;
 import com.wiled.ubicame.prestamos.entidades.PagoInteres;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
+import com.wiled.ubicame.prestamos.entidades.Renegociacion;
 import com.wiled.ubicame.prestamos.entidades.TipoPago;
 import com.wiled.ubicame.prestamos.utils.PrestamoUtils;
 import java.awt.Color;
@@ -33,6 +34,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 import static com.wiled.ubicame.prestamos.utils.PrestamoUtils.*;
 import org.quartz.SchedulerException;
+
 /**
  *
  * @author edgar
@@ -45,20 +47,19 @@ public class PagoForm extends javax.swing.JDialog {
     private final String GUARDAR_CAMBIOS = "guardarCambios";
     private final String NUEVO_PRESTAMO = "nuevoPrestamo";
     private final String RENEGOCIAR = "renegociar";
-    
-    
+
     /** Creates new form PagoForm */
     public PagoForm(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        jFrame = parent; 
+        jFrame = parent;
     }
-   
+
     private void activarEstadoRenegociar(boolean encendido) {
         crearPrestamoBtn.setText("RENEGOCIAR PRESTAMO");
         crearPrestamoBtn.setActionCommand(RENEGOCIAR);
-        
-        if(encendido) {
+
+        if (encendido) {
             fechaTxt.setEnabled(true);
             fechaTxt.setEditable(true);
 
@@ -82,25 +83,24 @@ public class PagoForm extends javax.swing.JDialog {
 
             tasaTxt.setEditable(false);
             tasaTxt.setEnabled(false);
-        }             
-
+        }
     }
-    
+
     private void activarEstadoCrearPrestamo() {
         aplicarPagoBtn.setEnabled(false);
         crearPrestamoBtn.setText("CREAR NUEVO PRESTAMO");
         crearPrestamoBtn.setActionCommand(NUEVO_PRESTAMO);
         crearPrestamoBtn.setVisible(true);
     }
-    
+
     public PagoForm(java.awt.Frame parent, boolean modal, Cliente cliente) {
         super(parent, modal);
         initComponents();
         this.cliente = cliente;
         jFrame = parent;
-                    
+
         datePicker.setDate(PrestamoUtils.getCurrentDate());
-        
+
         controller = Controller.getInstance(PrestamoConstants.PROD_PU);
         tipoPagoCBox.insertItemAt(TipoPago.ABONO, 0);
         tipoPagoCBox.insertItemAt(TipoPago.PAGO_INTERES, 1);
@@ -112,27 +112,29 @@ public class PagoForm extends javax.swing.JDialog {
         prestamo = cliente.getPrestamos().get(totalPrestamos - 1);
 
         controller.refresh(prestamo);
-        
-        
-        montoTxt.setText(String.valueOf(PrestamoUtils.montoAdeudado(prestamo)));
+
+        double montoAdeudado = PrestamoUtils.montoAdeudado(prestamo);
+        montoTxt.setText(String.valueOf(montoAdeudado));
         montoTxt.setEditable(false);
 
         fechaTxt.setDate(PrestamoUtils.ultimaFechaPrestamo(prestamo));
-        tasaTxt.setText(String.valueOf(prestamo.getTasa()));
-        tasaTxt.setEditable(false);
         
+        float tasa = PrestamoUtils.buscarTasaHastaLaFecha(prestamo, PrestamoUtils.getCurrentDate());
+        tasaTxt.setText(String.valueOf(tasa));
+        tasaTxt.setEditable(false);
+
         FormaPago ultimaFormaPago = PrestamoUtils.ultimaFormaPagoPrestamo(prestamo);
-                            
+
         List<FormaPago> formasPago = PrestamoUtils.getFormasPago();
         for (int i = 0; i < formasPago.size(); i++) {
-            formaPagoCBox.insertItemAt(formasPago.get(i), i);            
+            formaPagoCBox.insertItemAt(formasPago.get(i), i);
         }
-        
+
         formaPagoCBox.setSelectedItem(ultimaFormaPago);
         formaPagoCBox.setEditable(false);
 
         double interesAcumulado = PrestamoUtils.getInteresAcumulado(prestamo);
-        
+
         interesesTxt.setText(String.valueOf(PrestamoUtils.redondear(interesAcumulado, 2)));
         interesesTxt.setEditable(false);
 
@@ -148,58 +150,57 @@ public class PagoForm extends javax.swing.JDialog {
         pagosTable.updateUI();
 
         moraPagoTxt.setText("0");
-               
+
         pagosTable.addKeyListener(new KeyAdapter() {
-            
             @Override
             public void keyReleased(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_DELETE) {
+                if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                     Pago pago = ((PagosTableModel) pagosTable.getModel()).pagos.get(pagosTable.getSelectedRow());
                     ((PagosTableModel) pagosTable.getModel()).pagos.remove(pagosTable.getSelectedRow());
                     pagosTable.updateUI();
 
-                    if( pago instanceof Abono) {
+                    if (pago instanceof Abono) {
                         prestamo.getAbonos().remove((Abono) pago);
                         //prestamo.getAbonos().remove();
-                        controller.removeAbono((Abono) pago);                        
+                        controller.removeAbono((Abono) pago);
                         prestamo.setMonto(prestamo.getMonto() + pago.getMonto());
                         controller.merge(prestamo);
-                    } else if ( pago instanceof PagoInteres) {
+                    } else if (pago instanceof PagoInteres) {
                         prestamo.getPagos().remove((PagoInteres) pago);
-                        
+
                         controller.removePagoInteres((PagoInteres) pago);
                         controller.merge(prestamo);
                     }
-                    
+
                     List<Pago> pagos = new ArrayList<Pago>();
                     pagos.addAll(prestamo.getAbonos());
                     pagos.addAll(prestamo.getPagos());
 
                     pagosTable.setModel(new PagosTableModel(pagos));
                     pagosTable.updateUI();
-                    
+
                     montoTxt.setText(String.valueOf(prestamo.getMonto()));
-                    
+
                     double interesAcumulado = PrestamoUtils.getInteresAcumulado(prestamo);
-                            
+
                     interesesTxt.setText(String.valueOf(PrestamoUtils.redondear(interesAcumulado, 2)));
-                    
+
                     double totalAbonado = Controller.getTotalAbonado(prestamo.getAbonos());
                     abonadoTxt.setText(String.valueOf(totalAbonado));
-                    
+
                     JOptionPane.showMessageDialog(rootPane, "Pago eliminado exitosamente", "Eliminacion de Pago", JOptionPane.INFORMATION_MESSAGE);
                 }
-            }            
+            }
         });
-        
+
         activarEstadoRenegociar(false);
-                
+
         if (PrestamoUtils.prestamoSaldado(prestamo)) {
             //Significa que el prestamo ya se pago
             activarEstadoCrearPrestamo();
         } else {
             try {
-                cuotaTxt.setText(String.valueOf(controller.amortizarPrestamo(prestamo.getMonto(), prestamo.getTasa())));
+                cuotaTxt.setText(String.valueOf(controller.amortizarPrestamo(montoAdeudado, tasa)));
             } catch (PrestamoException ex) {
                 JOptionPane.showMessageDialog(parent, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
             }
@@ -253,7 +254,7 @@ public class PagoForm extends javax.swing.JDialog {
                     break;
             }
 
-            return value;
+            return value; 
         }
     }
 
@@ -534,8 +535,8 @@ public class PagoForm extends javax.swing.JDialog {
         AdministrarCliente adm = new AdministrarCliente(jFrame, true, cliente);
         adm.setLocationRelativeTo(null);
         adm.setVisible(true);
-        
-        if(adm.isClienteEliminado()) {
+
+        if (adm.isClienteEliminado()) {
             dispose();
         }
     }//GEN-LAST:event_administrarClienteBtnActionPerformed
@@ -558,10 +559,10 @@ public class PagoForm extends javax.swing.JDialog {
         abonadoTxt.setText(String.valueOf(totalAbonado));
 
         double interesAcumulado = PrestamoUtils.getInteresAcumulado(prestamo);
-                
+
         interesesTxt.setText(String.valueOf(PrestamoUtils.redondear(interesAcumulado, 2)));
         interesesTxt.updateUI();
-        
+
         montoTxt.updateUI();
         abonadoTxt.updateUI();
 
@@ -597,15 +598,15 @@ public class PagoForm extends javax.swing.JDialog {
             tipoPagoCBox.grabFocus();
             return;
         }
-        
+
         if (PrestamoUtils.prestamoSaldado(prestamo)) {
             JOptionPane.showMessageDialog(rootPane, "Este prestamo ya ha sido saldado", "ERROR", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         boolean pagoAplicado = false;
         String concepto = "";
-        
+
         if (tipoPagoCBox.getSelectedItem().equals(TipoPago.PAGO_INTERES)) {
             if (!containsOnlyNumbers(moraPagoTxt.getText())) {
                 JOptionPane.showMessageDialog(jFrame, "Por favor digite un valor numerico en el campo 'Mora'", "ERROR DE VALIDACION", JOptionPane.ERROR_MESSAGE);
@@ -618,16 +619,16 @@ public class PagoForm extends javax.swing.JDialog {
                         datePicker.getDate(),
                         Double.valueOf(montoPagoTxt.getText()),
                         Double.valueOf(moraPagoTxt.getText()));
-                
+
                 concepto = "PAGO INTERES";
-                
+
             } catch (PrestamoException ex) {
                 JOptionPane.showMessageDialog(jFrame, ex.getMessage(), "ERROR APLICANDO PAGO", JOptionPane.ERROR_MESSAGE);
             }
         } else {
             try {
                 pagoAplicado = controller.aplicarAbonoPrestamo(prestamo, datePicker.getDate(), Double.valueOf(montoPagoTxt.getText()));
-                
+
                 concepto = "ABONO";
             } catch (PrestamoException ex) {
                 JOptionPane.showMessageDialog(jFrame, ex.getMessage(), "ERROR APLICANDO PAGO", JOptionPane.ERROR_MESSAGE);
@@ -636,10 +637,10 @@ public class PagoForm extends javax.swing.JDialog {
 
         if (pagoAplicado) {
             reloadPagoTable();
-            
+
             int confirmation = JOptionPane.showConfirmDialog(rootPane, "Desea imprimir una factura ?", "IMPRESION DE FACTURA", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-            
-            if(confirmation == JOptionPane.YES_OPTION) {
+
+            if (confirmation == JOptionPane.YES_OPTION) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("Sistema de Prestamos\n");
                 sb.append("--------------------\n\n");
@@ -656,36 +657,54 @@ public class PagoForm extends javax.swing.JDialog {
                 } catch (PrintException ex) {
                     JOptionPane.showMessageDialog(jFrame, ex.getMessage(), "ERROR IMPRIMIENDO FACTURA", JOptionPane.ERROR_MESSAGE);
                 }
-            }           
+            }
         }
     }//GEN-LAST:event_aplicarPagoBtnActionPerformed
 
     private void crearPrestamoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crearPrestamoBtnActionPerformed
-        if(evt.getActionCommand().equalsIgnoreCase(RENEGOCIAR)) {
+        if (evt.getActionCommand().equalsIgnoreCase(RENEGOCIAR)) {
             activarEstadoRenegociar(true);
-            
+
             crearPrestamoBtn.setActionCommand(GUARDAR_CAMBIOS);
             crearPrestamoBtn.setText("GUARDAR CAMBIOS");
-            
-        } else if(evt.getActionCommand().equalsIgnoreCase(NUEVO_PRESTAMO)){
+
+        } else if (evt.getActionCommand().equalsIgnoreCase(NUEVO_PRESTAMO)) {
             CrearPrestamo form = new CrearPrestamo(jFrame, true, cliente);
             form.setLocationRelativeTo(null);
             form.setVisible(true);
 
             dispose();
         } else if (evt.getActionCommand().equalsIgnoreCase(GUARDAR_CAMBIOS)) {
-            prestamo.setMonto(Double.valueOf(montoTxt.getText()));
-            prestamo.setFecha(fechaTxt.getDate());
-            prestamo.setFormaPago((FormaPago)formaPagoCBox.getSelectedItem());
-            prestamo.setTasa(Float.valueOf(tasaTxt.getText()));
             
-            try {
-                controller.modificarPrestamo(prestamo);
-                activarEstadoRenegociar(false);
-            } catch (SchedulerException ex) {
-                JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "ERROR ELIMINANDO JOB", JOptionPane.ERROR_MESSAGE);                
+            double monto = Double.valueOf(montoTxt.getText());
+            FormaPago formaPago = (FormaPago) formaPagoCBox.getSelectedItem();
+            float tasa = Float.valueOf(tasaTxt.getText());
+            
+            if (monto != prestamo.getMonto()
+                    || formaPago != prestamo.getFormaPago()
+                    || tasa != prestamo.getTasa()) {
+
+                Renegociacion renegociacion = new Renegociacion();
+                renegociacion.setPrestamo(prestamo);               
+                
+                double montoAgregado = Double.valueOf(montoTxt.getText()) - PrestamoUtils.montoAdeudado(prestamo);
+                renegociacion.setMontoAgregado(montoAgregado);
+
+                float nuevaTasa = Float.valueOf(tasaTxt.getText()) - PrestamoUtils.buscarTasaHastaLaFecha(prestamo, PrestamoUtils.getCurrentDate());
+                renegociacion.setNuevaTasa(nuevaTasa);
+
+                renegociacion.setFecha(fechaTxt.getDate());
+                renegociacion.setNuevaFormaPago((FormaPago) formaPagoCBox.getSelectedItem());
+
+                try {
+                    controller.modificarPrestamo(renegociacion);                    
+                } catch (SchedulerException ex) {
+                    JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "ERROR ELIMINANDO JOB", JOptionPane.ERROR_MESSAGE);
+                }
             }
-        }      
+            
+            activarEstadoRenegociar(false);
+        }
     }//GEN-LAST:event_crearPrestamoBtnActionPerformed
 
     private void verEditarComentarioBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verEditarComentarioBtnActionPerformed
@@ -694,7 +713,6 @@ public class PagoForm extends javax.swing.JDialog {
         form.setLocationRelativeTo(null);
         form.setVisible(true);
     }//GEN-LAST:event_verEditarComentarioBtnActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField abonadoTxt;
     private javax.swing.JButton administrarClienteBtn;

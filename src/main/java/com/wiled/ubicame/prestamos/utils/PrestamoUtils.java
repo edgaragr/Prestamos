@@ -38,7 +38,7 @@ import javax.print.SimpleDoc;
 public class PrestamoUtils {
 
     public static float amortizarPrestamo(double monto, float tasa) {
-        return 0f;
+        return (float) ((monto*tasa)/100);
     }
 
     public static boolean containsOnlyNumbers(String str) {
@@ -115,6 +115,7 @@ public class PrestamoUtils {
         Date fechaActual = getCurrentDate();
         int diasEntreFechas = diasEntreFechas(fechaInicioPrestamo, fechaActual);
 
+        System.out.println("Dias entre fechas: "  + diasEntreFechas);
         double interesGanado = 0;
         double interesPagado = totalInteresesPagados(p);
         
@@ -215,6 +216,7 @@ public class PrestamoUtils {
     }
     
     public static double buscarAbonoHastaLaFecha(Prestamo p, Date fecha) {
+        System.out.println("Buscando abono en fecha: " + fecha);
         double abonos = 0;
         
         for(Abono abono : p.getAbonos()) {
@@ -237,6 +239,20 @@ public class PrestamoUtils {
             }                
         }        
         return renegociaciones;
+    }
+    
+    public static float buscarTasaHastaLaFecha(Prestamo p, Date fecha) {
+        float tasa = p.getTasa();
+        
+        for(Renegociacion r : p.getRenegociaciones()) {
+            if(r.getFecha().before(fecha)) {
+                tasa += r.getNuevaTasa();
+            } else {
+                break;
+            }                
+        }
+        
+        return tasa;
     }
     
     private static int diasEntreFechas(Date fechaInicial, Date fechaFinal) {
