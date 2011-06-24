@@ -26,7 +26,6 @@ import java.awt.Font;
 import javax.swing.UIManager;
 import com.wiled.ubicame.prestamos.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
-import com.wiled.ubicame.prestamos.datalayer.ScriptExecuter;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.CriterioBusqueda;
 import com.wiled.ubicame.prestamos.entidades.Usuario;
@@ -145,14 +144,14 @@ public class Application extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         resultTable = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        backupMenu = new javax.swing.JMenuItem();
-        menuSalir = new javax.swing.JMenuItem();
-        jMenu4 = new javax.swing.JMenu();
-        crearCliente = new javax.swing.JMenuItem();
+        menuClientes = new javax.swing.JMenu();
+        crearClienteMenu = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         amortizarPrestamo = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
+        jMenu1 = new javax.swing.JMenu();
+        backupMenu = new javax.swing.JMenuItem();
+        menuSalir = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Sistema de Presamos");
@@ -183,6 +182,33 @@ public class Application extends javax.swing.JFrame {
         jScrollPane1.setViewportView(resultTable);
         resultTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
+        menuClientes.setText("Clientes");
+
+        crearClienteMenu.setText("Crear Cliente");
+        crearClienteMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                crearClienteMenuActionPerformed(evt);
+            }
+        });
+        menuClientes.add(crearClienteMenu);
+
+        jMenuBar1.add(menuClientes);
+
+        jMenu3.setText("Utilidades");
+
+        amortizarPrestamo.setText("Amortizar Prestamo");
+        amortizarPrestamo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                amortizarPrestamoActionPerformed(evt);
+            }
+        });
+        jMenu3.add(amortizarPrestamo);
+
+        jMenuBar1.add(jMenu3);
+
+        jMenu5.setText("Reportes");
+        jMenuBar1.add(jMenu5);
+
         jMenu1.setText("Operaciones");
         jMenu1.setToolTipText("Opciones Generales");
 
@@ -203,33 +229,6 @@ public class Application extends javax.swing.JFrame {
         jMenu1.add(menuSalir);
 
         jMenuBar1.add(jMenu1);
-
-        jMenu4.setText("Clientes");
-
-        crearCliente.setText("Crear");
-        crearCliente.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                crearClienteActionPerformed(evt);
-            }
-        });
-        jMenu4.add(crearCliente);
-
-        jMenuBar1.add(jMenu4);
-
-        jMenu3.setText("Utilidades");
-
-        amortizarPrestamo.setText("Amortizar Prestamo");
-        amortizarPrestamo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                amortizarPrestamoActionPerformed(evt);
-            }
-        });
-        jMenu3.add(amortizarPrestamo);
-
-        jMenuBar1.add(jMenu3);
-
-        jMenu5.setText("Reportes");
-        jMenuBar1.add(jMenu5);
 
         setJMenuBar(jMenuBar1);
 
@@ -262,28 +261,11 @@ public class Application extends javax.swing.JFrame {
                     .addComponent(buscarBtn))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 428, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void crearClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crearClienteActionPerformed
-        // TODO add your handling code here:
-        CrearClientes form = new CrearClientes(this, true);
-        form.setLocationRelativeTo(null);
-        form.setVisible(true);
-
-        if (form.getClienteCreado() != null) {
-            Cliente cliente = form.getClienteCreado();
-
-            CrearPrestamo crearPrestamoForm = new CrearPrestamo(null, true, cliente);
-            crearPrestamoForm.setLocationRelativeTo(null);
-            crearPrestamoForm.setVisible(true);
-
-
-        }
-    }//GEN-LAST:event_crearClienteActionPerformed
 
     private void amortizarPrestamoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_amortizarPrestamoActionPerformed
         // TODO add your handling code here:
@@ -354,6 +336,22 @@ public class Application extends javax.swing.JFrame {
         form.setLocationRelativeTo(null);
         form.setVisible(true);
     }//GEN-LAST:event_backupMenuActionPerformed
+
+    private void crearClienteMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crearClienteMenuActionPerformed
+                CrearClientes form = new CrearClientes(this, true);
+        form.setLocationRelativeTo(null);
+        form.setVisible(true);
+
+        if (form.getClienteCreado() != null) {
+            Cliente cliente = form.getClienteCreado();
+
+            CrearPrestamo crearPrestamoForm = new CrearPrestamo(null, true, cliente);
+            crearPrestamoForm.setLocationRelativeTo(null);
+            crearPrestamoForm.setVisible(true);
+
+
+        }
+    }//GEN-LAST:event_crearClienteMenuActionPerformed
 
     /**
      * @param args the command line arguments
@@ -474,12 +472,6 @@ public class Application extends javax.swing.JFrame {
                 em.persist(usr);
                 em.getTransaction().commit();
 
-                try {
-                    ScriptExecuter.executeScript();
-                } catch (SQLException ex) {
-                    return false;
-                }
-
                 return true;
             }
         }
@@ -538,15 +530,15 @@ public class Application extends javax.swing.JFrame {
     private javax.swing.JMenuItem amortizarPrestamo;
     private javax.swing.JMenuItem backupMenu;
     private javax.swing.JButton buscarBtn;
-    private javax.swing.JMenuItem crearCliente;
+    private javax.swing.JMenuItem crearClienteMenu;
     private javax.swing.JComboBox criterioBusquedaCombo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu3;
-    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JMenu menuClientes;
     private javax.swing.JMenuItem menuSalir;
     private javax.swing.JTable resultTable;
     private javax.swing.JTextField valorBusquedaTxt;

@@ -113,21 +113,30 @@ public class PagoForm extends javax.swing.JDialog {
 
         controller.refresh(prestamo);
         
-        montoTxt.setText(String.valueOf(prestamo.getMonto()));
+        
+        montoTxt.setText(String.valueOf(PrestamoUtils.montoAdeudado(prestamo)));
         montoTxt.setEditable(false);
 
-        fechaTxt.setDate(prestamo.getFecha());
+        fechaTxt.setDate(PrestamoUtils.ultimaFechaPrestamo(prestamo));
         tasaTxt.setText(String.valueOf(prestamo.getTasa()));
         tasaTxt.setEditable(false);
-
-        formaPagoCBox.insertItemAt(prestamo.getFormaPago(), 0);
-        formaPagoCBox.setSelectedIndex(0);
+        
+        FormaPago ultimaFormaPago = PrestamoUtils.ultimaFormaPagoPrestamo(prestamo);
+                            
+        List<FormaPago> formasPago = PrestamoUtils.getFormasPago();
+        for (int i = 0; i < formasPago.size(); i++) {
+            formaPagoCBox.insertItemAt(formasPago.get(i), i);            
+        }
+        
+        formaPagoCBox.setSelectedItem(ultimaFormaPago);
         formaPagoCBox.setEditable(false);
 
-        interesesTxt.setText(String.valueOf(prestamo.getInteresAcumulado()));
+        double interesAcumulado = PrestamoUtils.getInteresAcumulado(prestamo);
+        
+        interesesTxt.setText(String.valueOf(PrestamoUtils.redondear(interesAcumulado, 2)));
         interesesTxt.setEditable(false);
 
-        double totalAbonado = Controller.getTotalAbonado(prestamo.getAbonos());
+        double totalAbonado = PrestamoUtils.buscarAbonoHastaLaFecha(prestamo, PrestamoUtils.getCurrentDate());
         abonadoTxt.setText(String.valueOf(totalAbonado));
         abonadoTxt.setEditable(false);
 
@@ -170,7 +179,10 @@ public class PagoForm extends javax.swing.JDialog {
                     pagosTable.updateUI();
                     
                     montoTxt.setText(String.valueOf(prestamo.getMonto()));
-                    interesesTxt.setText(String.valueOf(prestamo.getInteresAcumulado()));
+                    
+                    double interesAcumulado = PrestamoUtils.getInteresAcumulado(prestamo);
+                            
+                    interesesTxt.setText(String.valueOf(PrestamoUtils.redondear(interesAcumulado, 2)));
                     
                     double totalAbonado = Controller.getTotalAbonado(prestamo.getAbonos());
                     abonadoTxt.setText(String.valueOf(totalAbonado));
@@ -182,7 +194,7 @@ public class PagoForm extends javax.swing.JDialog {
         
         activarEstadoRenegociar(false);
                 
-        if (prestamo.getInteresAcumulado() == 0 && prestamo.getMonto() == 0) {
+        if (PrestamoUtils.prestamoSaldado(prestamo)) {
             //Significa que el prestamo ya se pago
             activarEstadoCrearPrestamo();
         } else {
@@ -283,6 +295,7 @@ public class PagoForm extends javax.swing.JDialog {
         jLabel1 = new javax.swing.JLabel();
         cuotaTxt = new javax.swing.JTextField();
         fechaTxt = new org.jdesktop.swingx.JXDatePicker();
+        verEditarComentarioBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Pagos");
@@ -416,14 +429,22 @@ public class PagoForm extends javax.swing.JDialog {
 
         fechaTxt.setEnabled(false);
 
+        verEditarComentarioBtn.setBackground(java.awt.Color.orange);
+        verEditarComentarioBtn.setText("VER / EDITAR COMENTARIO");
+        verEditarComentarioBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                verEditarComentarioBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
@@ -442,11 +463,11 @@ public class PagoForm extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(nameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
+                                .addComponent(nameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(administrarClienteBtn))
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                         .addComponent(jLabel7)
                                         .addGap(18, 18, 18)
@@ -454,7 +475,7 @@ public class PagoForm extends javax.swing.JDialog {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                         .addComponent(jLabel1)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(cuotaTxt))
+                                        .addComponent(cuotaTxt, javax.swing.GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE))
                                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                         .addComponent(jLabel4)
                                         .addGap(4, 4, 4)
@@ -462,10 +483,12 @@ public class PagoForm extends javax.swing.JDialog {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(jLabel5)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(fechaTxt, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE))))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(verEditarComentarioBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
+                                    .addComponent(fechaTxt, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)))))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 779, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -488,18 +511,18 @@ public class PagoForm extends javax.swing.JDialog {
                         .addComponent(fechaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel5)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel6)
-                        .addComponent(interesesTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel7)
-                        .addComponent(abonadoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel1))
-                    .addComponent(cuotaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(interesesTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7)
+                    .addComponent(abonadoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1)
+                    .addComponent(cuotaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(verEditarComentarioBtn))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -529,12 +552,14 @@ public class PagoForm extends javax.swing.JDialog {
         tableModel.pagos.addAll(pagos);
 
         pagosTable.updateUI();
-        montoTxt.setText(String.valueOf(prestamo.getMonto()));
+        montoTxt.setText(String.valueOf(PrestamoUtils.montoAdeudado(prestamo)));
 
-        double totalAbonado = Controller.getTotalAbonado(prestamo.getAbonos());
+        double totalAbonado = PrestamoUtils.buscarAbonoHastaLaFecha(prestamo, PrestamoUtils.getCurrentDate());
         abonadoTxt.setText(String.valueOf(totalAbonado));
 
-        interesesTxt.setText(String.valueOf(prestamo.getInteresAcumulado()));
+        double interesAcumulado = PrestamoUtils.getInteresAcumulado(prestamo);
+                
+        interesesTxt.setText(String.valueOf(PrestamoUtils.redondear(interesAcumulado, 2)));
         interesesTxt.updateUI();
         
         montoTxt.updateUI();
@@ -572,8 +597,8 @@ public class PagoForm extends javax.swing.JDialog {
             tipoPagoCBox.grabFocus();
             return;
         }
-
-        if (prestamo.getInteresAcumulado() == 0 && prestamo.getMonto() == 0 || prestamo.getMonto() < 0) {
+        
+        if (PrestamoUtils.prestamoSaldado(prestamo)) {
             JOptionPane.showMessageDialog(rootPane, "Este prestamo ya ha sido saldado", "ERROR", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -662,6 +687,14 @@ public class PagoForm extends javax.swing.JDialog {
             }
         }      
     }//GEN-LAST:event_crearPrestamoBtnActionPerformed
+
+    private void verEditarComentarioBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verEditarComentarioBtnActionPerformed
+        // TODO add your handling code here:
+        ComentarioForm form = new ComentarioForm(jFrame, true, prestamo);
+        form.setLocationRelativeTo(null);
+        form.setVisible(true);
+    }//GEN-LAST:event_verEditarComentarioBtnActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField abonadoTxt;
     private javax.swing.JButton administrarClienteBtn;
@@ -692,6 +725,7 @@ public class PagoForm extends javax.swing.JDialog {
     private javax.swing.JTable pagosTable;
     private javax.swing.JTextField tasaTxt;
     private javax.swing.JComboBox tipoPagoCBox;
+    private javax.swing.JButton verEditarComentarioBtn;
     // End of variables declaration//GEN-END:variables
     private Cliente cliente;
 }

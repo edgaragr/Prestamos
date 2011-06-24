@@ -7,34 +7,26 @@ package com.wiled.ubicame.prestamos.datalayer;
 import org.quartz.JobKey;
 import org.slf4j.Logger;
 import com.wiled.ubicame.prestamos.entidades.Usuario;
-import org.quartz.Trigger;
 import com.wiled.ubicame.prestamos.utils.PrestamoException;
 import com.wiled.ubicame.prestamos.entidades.Abono;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.FormaPago;
 import com.wiled.ubicame.prestamos.entidades.PagoInteres;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
-import com.wiled.ubicame.prestamos.schedules.PrestamoJob;
+import com.wiled.ubicame.prestamos.entidades.Renegociacion;
 import com.wiled.ubicame.prestamos.utils.PrestamoConstants;
+import com.wiled.ubicame.prestamos.utils.PrestamoUtils;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
-import javax.swing.JOptionPane;
-import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.LoggerFactory;
 
-import static org.quartz.TriggerBuilder.*;
-import static org.quartz.JobBuilder.*;
-import static org.quartz.DateBuilder.*;
-import static org.quartz.SimpleScheduleBuilder.*;
-import static org.quartz.CalendarIntervalScheduleBuilder.*;
 
 /**
  *
@@ -51,14 +43,7 @@ public class Controller {
     private Controller(String persistenceUnit) {
         emf = Persistence.createEntityManagerFactory(persistenceUnit);
         em = emf.createEntityManager();
-        log = LoggerFactory.getLogger(Controller.class);
-        
-        try {
-            scheduler  = StdSchedulerFactory.getDefaultScheduler();
-            scheduler.start();
-        } catch (SchedulerException sex) {
-            JOptionPane.showMessageDialog(null, sex.getMessage(), "ERROR SCHEDULER", JOptionPane.ERROR_MESSAGE);
-        }                
+        log = LoggerFactory.getLogger(Controller.class);             
     }
 
     private Controller() {
@@ -167,58 +152,23 @@ public class Controller {
     
     public boolean aplicarPagoIntereses(Prestamo prestamo, Date fecha, final double monto, final double mora)  throws PrestamoException {
         if ((monto < 0) || (mora < 0)) throw new PrestamoException("Valor del 'monto' o la 'mora' es menor que cero (0)") ;
-        
-        //verificar si tiene intereses acumulados
-        if(prestamo.getInteresAcumulado() > 0) {
-            //Aplicar pago a interes acumulado
-            double interesAcumulado = prestamo.getInteresAcumulado();
-            double restante = interesAcumulado - (monto + mora);
-            
-            if(restante < 0) {
-                prestamo.setInteresAcumulado(0);
-                
-                PagoInteres pago = new PagoInteres();
-                pago.setMonto(Math.abs(restante));
-                pago.setMora(mora);
-                pago.setPrestamo(prestamo);
-                pago.setFecha(fecha);
-                            
-                prestamo.getPagos().add(pago);
-                merge(prestamo);
-                
-                if(pago.getId() != null)
-                    return true;
-                return false;
-            } else if (restante > 0) {
-                prestamo.setInteresAcumulado(restante);
-                merge(prestamo);
-                
-                return true;
-            } else {
-                prestamo.setInteresAcumulado(0);
-                merge(prestamo);
-                
-                return true;
-            }
-        } else if (prestamo.getInteresAcumulado() == 0){
-            //Aplicar un pago normal
-            PagoInteres pago = new PagoInteres();
-            pago.setMonto(monto);
-            pago.setMora(mora);
-            pago.setPrestamo(prestamo);
-            pago.setFecha(fecha);
-    
-            persist(pago);
-            
-            prestamo.getPagos().add(pago);
-            merge(prestamo);
 
-            if(pago.getId() != null)
-                return true;
-            return false;
-        }
+        PagoInteres pago = new PagoInteres();
+        pago.setMonto(monto);
+        pago.setMora(mora);
+        pago.setPrestamo(prestamo);
+        pago.setFecha(fecha);
+
+        persist(pago);
         
-        return false;
+        prestamo.getPagos().add(pago);
+        merge(prestamo);
+
+        refresh(pago);
+        
+        if(pago.getId() != null)
+            return true;
+        return false;                       
     }
     
     public List<Cliente> getClientes() {
@@ -227,8 +177,10 @@ public class Controller {
     }
     
     public boolean saldarPrestamo(Prestamo prestamo, Date fecha, double monto)  throws PrestamoException {
-        if(prestamo.getInteresAcumulado() > 0)
-            throw new PrestamoException("El Usuario aun posee RD$" + prestamo.getInteresAcumulado() + " en intereses pendientes");
+        double interesAcumulado = PrestamoUtils.getInteresAcumulado(prestamo);
+        
+        if(interesAcumulado > 0)
+            throw new PrestamoException("El Usuario aun posee RD$" + interesAcumulado + " en intereses pendientes");
         
         PagoInteres pago = new PagoInteres();
         pago.setMonto(monto);
@@ -256,11 +208,7 @@ public class Controller {
         
         return capitalAdeudado;
     }
-        
-    public double getInteresesPendientes(Prestamo p) {        
-        return p.getInteresAcumulado();
-    }
-    
+           
     public boolean aplicarAbonoPrestamo(Prestamo p, Date fecha, double monto)  throws PrestamoException {
         if (monto < 0) throw new PrestamoException("Valor del 'monto' es menor que cero (0)") ;
         
@@ -273,11 +221,11 @@ public class Controller {
         
         merge(p);
         
-        renegociarPrestamo(p);
+        //renegociarPrestamo(p);
         return true;
     }
     
-    public void renegociarPrestamo(Prestamo p) {
+    /*public void renegociarPrestamo(Prestamo p) {
         refresh(p);                
         double ultimoAbono = 0;
         
@@ -291,20 +239,25 @@ public class Controller {
         p.setMonto(nuevoBalance);
         
         merge(p);                
-    }
+    }*/
     
     public void modificarPrestamo(Prestamo p) throws SchedulerException {
+        //Crear una renegociacion
+        Renegociacion renegociacion = new Renegociacion();
+        renegociacion.setPrestamo(p);
+        renegociacion.setFecha(PrestamoUtils.getCurrentDate());       
+        
         Prestamo actual = em.find(Prestamo.class, p.getId());
-        if(!actual.getFormaPago().equals(p.getFormaPago())) {
-            //Hay que eliminar el trigger
-            eliminarJob(new JobKey("job" + p.getId(), "prestamos"));
-        }
+        double montoAgregado = p.getMonto() - actual.getMonto();
+        renegociacion.setMontoAgregado(montoAgregado);
         
-        actual.setMonto(p.getMonto());
-        actual.setFecha(p.getFecha());
-        actual.setFormaPago(p.getFormaPago());
-        actual.setTasa(p.getTasa());
+        float nuevaTasa = p.getTasa() - actual.getTasa();
+        renegociacion.setNuevaTasa(nuevaTasa);        
+        renegociacion.setNuevaFormaPago(p.getFormaPago());
+                
+        persist(renegociacion);
         
+        actual.getRenegociaciones().add(renegociacion);        
         merge(actual);
     }
     
@@ -351,71 +304,30 @@ public class Controller {
     }
     
     
-    public Prestamo crearPrestamo(Cliente cliente, String comentario, Date fecha, FormaPago formaPago, double monto, float tasa) throws PrestamoException, SchedulerException {
+    public Prestamo crearPrestamo(Cliente cliente, String comentario, Date fecha, FormaPago formaPago, double monto, float tasa) throws PrestamoException {
         if(monto < 0) throw new PrestamoException("Valor del 'monto' es menor que cero (0)");
          
         Prestamo prestamo = new Prestamo();
         prestamo.setCliente(cliente);
         prestamo.setComentario(comentario);
-        prestamo.setFecha(fecha);
+        
+        Calendar c = Calendar.getInstance();
+        //hora
+        int hora = c.get(Calendar.HOUR_OF_DAY);
+        int minuto = c.get(Calendar.MINUTE);
+                
+        c.setTime(fecha);
+        c.set(Calendar.HOUR_OF_DAY, hora);
+        c.set(Calendar.MINUTE, minuto);
+        
+        
+        prestamo.setFecha(c.getTime());
         prestamo.setFormaPago(formaPago);
         prestamo.setMonto(monto);
         prestamo.setTasa(tasa);
         
         persist(prestamo);
-                
-        if(!testing) {
-            // Crear el scheduler para generar los cortes de este prestamo
-            JobDataMap map = new JobDataMap();
-            map.put(PrestamoJob.PRESTAMO, prestamo.getId());
-
-            JobDetail job = newJob(PrestamoJob.class)
-                    .withIdentity("job" + prestamo.getId(), "prestamos")
-                    .usingJobData(map)
-                    .requestRecovery()
-                    .withDescription(prestamo.getComentario())
-                    .build();
-
-            Trigger trigger = null;
-
-            switch (formaPago) {
-                case DIARIO:
-                    trigger = newTrigger()
-                        .startAt(tomorrowAt(15, 0, 0))
-                        .withIdentity("trigger"+prestamo.getId(), "diarios")                    
-                        .withSchedule(simpleSchedule().withIntervalInHours(24).repeatForever())
-                        .build();
-                    break;
-                case MENSUAL:                              
-                    trigger = newTrigger()
-                        .withIdentity("trigger"+prestamo.getId(), "mensuales")
-                        .startAt(futureDate(30, IntervalUnit.DAY)) 
-                        .withSchedule(calendarIntervalSchedule()
-                            .withIntervalInMonths(1)) // interval is set in calendar months
-                        .build();
-                    break;
-                case QUINCENAL:
-                    trigger = newTrigger()
-                        .withIdentity("trigger"+prestamo.getId(), "quincenales")
-                        .startAt(futureDate(15, IntervalUnit.DAY)) 
-                        .withSchedule(calendarIntervalSchedule()
-                            .withIntervalInWeeks(2))
-                        .build();
-                    break;
-                case SEMANAL:
-                    trigger = newTrigger()
-                        .withIdentity("trigger"+prestamo.getId(), "quincenales")
-                        .startAt(futureDate(7, IntervalUnit.DAY))  
-                        .withSchedule(calendarIntervalSchedule()
-                            .withIntervalInWeeks(1))
-                        .build();
-                    break;
-            }
-
-            // Tell quartz to schedule the job using our trigger
-            scheduler.scheduleJob(job, trigger);
-        }
-        
+          
         if(prestamo.getId() != null)
             return prestamo;
         return null;

@@ -10,6 +10,7 @@
  */
 package com.wiled.ubicame.prestamos.forms;
 
+import java.util.List;
 import com.wiled.ubicame.prestamos.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.utils.PrestamoException;
 import com.wiled.ubicame.prestamos.datalayer.Controller;
@@ -17,11 +18,10 @@ import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.FormaPago;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
 import com.wiled.ubicame.prestamos.utils.PrestamoUtils;
-import java.util.Calendar;
 import java.util.Date;
 import javax.swing.JOptionPane;
-import org.quartz.SchedulerException;
 import static com.wiled.ubicame.prestamos.utils.PrestamoUtils.containsOnlyNumbers;
+
 /**
  *
  * @author edgar
@@ -29,19 +29,19 @@ import static com.wiled.ubicame.prestamos.utils.PrestamoUtils.containsOnlyNumber
 public class CrearPrestamo extends javax.swing.JDialog {
 
     private Cliente cliente;
+
     /** Creates new form CrearPrestamo */
     public CrearPrestamo(java.awt.Frame parent, boolean modal, Cliente cliente) {
         super(parent, modal);
         initComponents();
         this.cliente = cliente;
-        
+
         nombreLbl.setText(cliente.toString());
+        List<FormaPago> formasPago = PrestamoUtils.getFormasPago();
+        for (int i = 0; i < formasPago.size(); i++) {
+            formaPagoCombo.insertItemAt(formasPago.get(i), i);
+        }
         
-        formaPagoCombo.insertItemAt(FormaPago.DIARIO, 0);
-        formaPagoCombo.insertItemAt(FormaPago.SEMANAL, 1);
-        formaPagoCombo.insertItemAt(FormaPago.QUINCENAL, 2);
-        formaPagoCombo.insertItemAt(FormaPago.MENSUAL, 3);
-                      
         fechaDatePicker.setDate(PrestamoUtils.getCurrentDate());
     }
 
@@ -69,8 +69,6 @@ public class CrearPrestamo extends javax.swing.JDialog {
         tasaTxt = new javax.swing.JTextField();
         fechaDatePicker = new org.jdesktop.swingx.JXDatePicker();
         nombreLbl = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        interesesTxt = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Crear Prestamo");
@@ -109,8 +107,6 @@ public class CrearPrestamo extends javax.swing.JDialog {
 
         nombreLbl.setText("[NOMBRE]");
 
-        jLabel7.setText("Intereses Acumulados:");
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -132,7 +128,6 @@ public class CrearPrestamo extends javax.swing.JDialog {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(tasaTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(66, 66, 66))
-                    .addComponent(jLabel7)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4)
@@ -140,11 +135,7 @@ public class CrearPrestamo extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(formaPagoCombo, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                    .addGap(49, 49, 49)
-                                    .addComponent(interesesTxt))
-                                .addComponent(fechaDatePicker, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(fechaDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jLabel6)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
@@ -174,11 +165,7 @@ public class CrearPrestamo extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(fechaDatePicker, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(interesesTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -199,75 +186,64 @@ public class CrearPrestamo extends javax.swing.JDialog {
 
     private void crearBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crearBtnActionPerformed
         // TODO add your handling code here:
-        if(montoTxt.getText().isEmpty() || !containsOnlyNumbers(montoTxt.getText()) || Double.valueOf(montoTxt.getText()) < 0) {
+        if (montoTxt.getText().isEmpty() || !containsOnlyNumbers(montoTxt.getText()) || Double.valueOf(montoTxt.getText()) < 0) {
             JOptionPane.showMessageDialog(rootPane, "Digite un monto correcto", "ERROR", JOptionPane.ERROR_MESSAGE);
             montoTxt.grabFocus();
             return;
         }
-        
-        if(tasaTxt.getText().isEmpty() || !containsOnlyNumbers(tasaTxt.getText()) || Float.valueOf(tasaTxt.getText()) < 0.0f) {
+
+        if (tasaTxt.getText().isEmpty() || !containsOnlyNumbers(tasaTxt.getText()) || Float.valueOf(tasaTxt.getText()) < 0.0f) {
             JOptionPane.showMessageDialog(rootPane, "Digite una tasa correcto", "ERROR", JOptionPane.ERROR_MESSAGE);
             tasaTxt.grabFocus();
             return;
         }
-        
-        if(formaPagoCombo.getSelectedItem() == null) {
+
+        if (formaPagoCombo.getSelectedItem() == null) {
             JOptionPane.showMessageDialog(rootPane, "Elija una forma de pago", "ERROR", JOptionPane.ERROR_MESSAGE);
             formaPagoCombo.grabFocus();
             return;
         }
-        
-        if(fechaDatePicker.getDate() == null) {
+
+        if (fechaDatePicker.getDate() == null) {
             JOptionPane.showMessageDialog(rootPane, "Elija una fecha valida", "ERROR", JOptionPane.ERROR_MESSAGE);
             fechaDatePicker.grabFocus();
             return;
         }
-                
+
         Controller controller = Controller.getInstance(PrestamoConstants.PROD_PU);
 
         String comentario = comentarioTxt.getText();
         Date fecha = fechaDatePicker.getDate();
         FormaPago formaPago = (FormaPago) formaPagoCombo.getSelectedItem();
         double monto = Double.valueOf(montoTxt.getText());
-        float tasa = Float.valueOf(tasaTxt.getText());        
-
-        try {            
-            Prestamo creado  = controller.crearPrestamo(cliente, comentario, fecha, formaPago, monto, tasa);
-            
-            if(!interesesTxt.getText().isEmpty()) {
-                if(containsOnlyNumbers(interesesTxt.getText())) {
-                    creado.setInteresAcumulado(Double.valueOf(interesesTxt.getText()));
-                    controller.merge(creado);
-                }
-            }
-            
-            if(creado != null) {
+        float tasa = Float.valueOf(tasaTxt.getText());
+        
+        try {
+            Prestamo creado = controller.crearPrestamo(cliente, comentario, fecha, formaPago, monto, tasa);
+            if (creado != null) {
                 JOptionPane.showMessageDialog(rootPane, "Prestamo creado con exito", "Informacion", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
             } else {
                 JOptionPane.showMessageDialog(rootPane, "El prestamo no pudo ser creado", "ERROR", JOptionPane.ERROR_MESSAGE);
-            }            
+            }
         } catch (PrestamoException ex) {
             JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
-        } catch (SchedulerException sex) {
-            JOptionPane.showMessageDialog(rootPane, sex.getMessage(), "ERROR SCHEDULER", JOptionPane.ERROR_MESSAGE);
-        }        
+        }
+
+
     }//GEN-LAST:event_crearBtnActionPerformed
-        
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelarBtn;
     private javax.swing.JTextArea comentarioTxt;
     private javax.swing.JButton crearBtn;
     private org.jdesktop.swingx.JXDatePicker fechaDatePicker;
     private javax.swing.JComboBox formaPagoCombo;
-    private javax.swing.JTextField interesesTxt;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JFormattedTextField montoTxt;
     private javax.swing.JLabel nombreLbl;

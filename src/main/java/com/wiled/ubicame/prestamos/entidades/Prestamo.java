@@ -42,10 +42,21 @@ public class Prestamo implements Serializable {
     private List<PagoInteres> pagos;    
     @OneToMany(mappedBy = "prestamo", cascade= CascadeType.ALL)
     private List<Abono> abonos;
-    private double interesAcumulado;
+    @OneToMany(mappedBy = "prestamo")
+    private List<Renegociacion> renegociaciones;
 
+    public List<Renegociacion> getRenegociaciones() {
+        return renegociaciones;
+    }
+
+    public void setRenegociaciones(List<Renegociacion> renegociaciones) {
+        this.renegociaciones = renegociaciones;
+    }
+    
     public Prestamo() {
         abonos = new ArrayList<Abono>();
+        pagos = new ArrayList<PagoInteres>();
+        renegociaciones = new ArrayList<Renegociacion>();
     }
     
     public FormaPago getFormaPago() {
@@ -62,14 +73,6 @@ public class Prestamo implements Serializable {
 
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
-    }
-    
-    public double getInteresAcumulado() {
-        return interesAcumulado;
-    }
-
-    public void setInteresAcumulado(double interesAcumulado) {
-        this.interesAcumulado = interesAcumulado;
     }
     
     public List<Abono> getAbonos() {

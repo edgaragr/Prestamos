@@ -8,6 +8,7 @@ import com.wiled.ubicame.prestamos.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.entidades.Cliente;
 import com.wiled.ubicame.prestamos.entidades.FormaPago;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
+import com.wiled.ubicame.prestamos.utils.PrestamoUtils;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Logger;
@@ -79,7 +80,7 @@ public class PersistenceUnitTest extends TestCase {
     
     public void testGetInteresesPendientes() {
         double expResult = 0;
-        double intereses = instance.getInteresesPendientes(prestamo);
+        double intereses = PrestamoUtils.getInteresAcumulado(prestamo);
         
         assertEquals(expResult, intereses);
     }
@@ -121,7 +122,7 @@ public class PersistenceUnitTest extends TestCase {
     }
     
     public void testGetCapitalAdeudado() {
-        double expResult = 9800;
+        double expResult = 9900;
         double capitalAdeudado = instance.getCapitalAdeudado(prestamo);
         
         assertEquals(expResult, capitalAdeudado);
