@@ -13,6 +13,7 @@ package com.wiled.ubicame.prestamos.forms;
 import com.wiled.ubicame.prestamos.utils.PrestamoUtils;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
 /**
@@ -96,6 +97,10 @@ public class ExportForm extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(rootPane, "Archivo generado exitosamente", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
             
             dispose();
+        } catch (ClassNotFoundException ex) {
+            JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "ERROR GENERACION DE BACKUP", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "ERROR GENERACION DE BACKUP", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "ERROR GENERACION DE BACKUP", JOptionPane.ERROR_MESSAGE);
         }

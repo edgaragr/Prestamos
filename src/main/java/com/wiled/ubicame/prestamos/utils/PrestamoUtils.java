@@ -9,15 +9,13 @@ import com.wiled.ubicame.prestamos.entidades.FormaPago;
 import com.wiled.ubicame.prestamos.entidades.PagoInteres;
 import com.wiled.ubicame.prestamos.entidades.Prestamo;
 import com.wiled.ubicame.prestamos.entidades.Renegociacion;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -266,42 +264,26 @@ public class PrestamoUtils {
         return false;
     }
 
-    private static String getCurrentDateAsString() {
-        Date c = getCurrentDate();
-        SimpleDateFormat sdf = new SimpleDateFormat("-dd-MM-yyyy");
-        return sdf.format(c.getTime());
-    }
-
     public static Date getCurrentDate() {
         Calendar c = Calendar.getInstance();
         return c.getTime();
     }
 
-    public static void exportDataBase(String drive) throws IOException {
-        String path = "" + drive + "backup" + getCurrentDateAsString() + ".sql";
-        String dumpCommand = "mysqldump -uroot -pwiled prestamos -r " + path;
-        File tst = new File(path);
-        FileWriter fw = null;
+    public static void exportDataBase(String drive) throws IOException, ClassNotFoundException, SQLException {
+        Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+        Connection conn = DriverManager.getConnection("jdbc:derby:"+PrestamoConstants.SYSTEM_DATABASE_NAME+";user="+PrestamoConstants.SYSTEM_USER+";password="+PrestamoConstants.SYSTEM_PASSWORD+"");
+        
+        
+        // Get today's date as a string:
+        SimpleDateFormat todaysDate = new java.text.SimpleDateFormat("yyyy-MM-dd");
+        String backupdirectory = drive + todaysDate.format((java.util.Calendar.getInstance()).getTime());
 
-        fw = new FileWriter(tst);
-        fw.close();
-
-        Runtime rt = Runtime.getRuntime();
-
-        Process proc = rt.exec(dumpCommand);
-        InputStream in = proc.getInputStream();
-        InputStreamReader read = new InputStreamReader(in, "latin1");
-        BufferedReader br = new BufferedReader(read);
-        BufferedWriter bw = new BufferedWriter(new FileWriter(tst, true));
-        String line = null;
-        StringBuilder buffer = new StringBuilder();
-        while ((line = br.readLine()) != null) {
-            buffer.append(line).append("\n");
-        }
-        String toWrite = buffer.toString();
-        bw.write(toWrite);
-        bw.close();
-        br.close();
+        CallableStatement cs = conn.prepareCall("CALL SYSCS_UTIL.SYSCS_BACKUP_DATABASE(?)"); 
+        cs.setString(1, backupdirectory);
+        cs.execute(); 
+        cs.close();
+        
+        System.out.println("backed up database to "+backupdirectory);
     }
 
     public static void imprimirFactura(String factura) throws PrintException {

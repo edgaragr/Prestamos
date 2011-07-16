@@ -357,6 +357,8 @@ public class Application extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        setDBSystemDir();
+                    
         if (isSystemInstalled()) {
             final LoginService loginService = new PrestamoLoginService();
 
@@ -388,10 +390,10 @@ public class Application extends javax.swing.JFrame {
 
     private static boolean isSystemInstalled() {
         boolean result = false;
+        Connection c = null;
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection c = DriverManager.getConnection("jdbc:mysql://localhost:3306/"+PrestamoConstants.SYSTEM_DATABASE_NAME+"", 
-                    PrestamoConstants.SYSTEM_USER, PrestamoConstants.SYSTEM_PASSWORD);
+            Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+            c = DriverManager.getConnection("jdbc:derby:"+PrestamoConstants.SYSTEM_DATABASE_NAME+";user="+PrestamoConstants.SYSTEM_USER+";password="+PrestamoConstants.SYSTEM_PASSWORD+"");
             
             if(c.isValid(0)) result = true;
             
@@ -401,78 +403,68 @@ public class Application extends javax.swing.JFrame {
             try {
                 result = init();
             } catch (SQLException ex1) {
-                Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex1);
+                JOptionPane.showMessageDialog(null, ex1.getMessage(), "DRIVER DE BASE DE DATOS", JOptionPane.ERROR_MESSAGE);
+            }
+        } finally {
+            try {
+                if(c!=null) c.close();
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, ex.getMessage(), "DRIVER DE BASE DE DATOS", JOptionPane.ERROR_MESSAGE);
             }
         }
+        
         return result;
     }
 
+    private static void setDBSystemDir() {
+        String userHomeDir = System.getProperty("user.home", ".");
+        String systemDir = userHomeDir + "/.prestamos";
+
+        // Set the db system directory.
+        System.setProperty("derby.system.home", systemDir);
+    }
+    
     private static boolean init() throws SQLException {
         String password = JOptionPane.showInputDialog(null, "Introduzca password de Instalacion:", "INSTALACION", JOptionPane.INFORMATION_MESSAGE);
 
         if(password == null) return false;
-        
-        Statement statement = null;
         Connection c = null;
                 
         if (password.equalsIgnoreCase("k59svx")) {
-            try {
-                DatabaseConnection dbCon = new DatabaseConnection(null, true);
-                dbCon.setLocationRelativeTo(null);
-                dbCon.setVisible(true);
+            try {            
+                Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+                c = DriverManager.getConnection("jdbc:derby:"+PrestamoConstants.SYSTEM_DATABASE_NAME+";create=true;user="+PrestamoConstants.SYSTEM_USER+";password="+PrestamoConstants.SYSTEM_PASSWORD+"");
                 
-                if(dbCon.isValidado()) {
-                    c = DriverManager.getConnection("jdbc:mysql://localhost:3306/mysql", dbCon.getUsuario(), dbCon.getPassword());
-                    statement = c.createStatement();
-                    statement.executeUpdate("CREATE DATABASE "+ PrestamoConstants.SYSTEM_DATABASE_NAME+"");
+                Map params = new HashMap();
+                params.put("eclipselink.ddl-generation", "create-tables");
+                EntityManagerFactory emf = Persistence.createEntityManagerFactory(PrestamoConstants.PROD_PU, params);
+                EntityManager em = emf.createEntityManager();
+                
+                if (em != null) {
+                    String usuario = "";
+                    String contrasena = "";
 
-                    statement.executeUpdate("CREATE USER '"+PrestamoConstants.SYSTEM_USER+"'@'localhost' IDENTIFIED BY '"+PrestamoConstants.SYSTEM_PASSWORD+"';");
-                    statement.executeUpdate("GRANT ALL PRIVILEGES ON *.* TO '"+PrestamoConstants.SYSTEM_USER+"'@'localhost' WITH GRANT OPTION;");
-                } else { return false; }                                             
-            } catch (SQLException ex) {
-                return false;
-            } finally {
-                if (statement != null) {
-                    try {
-                        statement.close();
-                    } catch (SQLException e) {
-                    } // nothing we can do
+                    while (usuario.equalsIgnoreCase("")) {
+                        usuario = JOptionPane.showInputDialog(null, "Introduzca Nombre de Usuario::", "INSTALACION", JOptionPane.INFORMATION_MESSAGE);
+                    }
+
+                    while (contrasena.equalsIgnoreCase("")) {
+                        contrasena = JOptionPane.showInputDialog(null, "Introduzca Contrasena para el usuario::", "INSTALACION", JOptionPane.INFORMATION_MESSAGE);
+                    }
+
+                    //Crear usuario por defecto
+                    Usuario usr = new Usuario();
+                    usr.setUsuario(usuario);
+                    usr.setPassword(contrasena);
+
+                    em.getTransaction().begin();
+                    em.persist(usr);
+                    em.getTransaction().commit();
+
+                    return true;
                 }
-                if (c != null) {
-                    try {
-                        c.close();
-                    } catch (SQLException e) {
-                    } // nothing we can do
-                }
-            }
-
-            Map params = new HashMap();
-            params.put("eclipselink.ddl-generation", "create-tables");
-            EntityManagerFactory emf = Persistence.createEntityManagerFactory(PrestamoConstants.PROD_PU, params);
-            EntityManager em = emf.createEntityManager();
-
-            if (em != null) {
-                String usuario = "";
-                String contrasena = "";
-
-                while (usuario.equalsIgnoreCase("")) {
-                    usuario = JOptionPane.showInputDialog(null, "Introduzca Nombre de Usuario::", "INSTALACION", JOptionPane.INFORMATION_MESSAGE);
-                }
-
-                while (contrasena.equalsIgnoreCase("")) {
-                    contrasena = JOptionPane.showInputDialog(null, "Introduzca Contrasena para el usuario::", "INSTALACION", JOptionPane.INFORMATION_MESSAGE);
-                }
-
-                //Crear usuario por defecto
-                Usuario usr = new Usuario();
-                usr.setUsuario(usuario);
-                usr.setPassword(contrasena);
-
-                em.getTransaction().begin();
-                em.persist(usr);
-                em.getTransaction().commit();
-
-                return true;
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 

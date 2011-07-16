@@ -4,7 +4,6 @@
  */
 package com.wiled.ubicame.prestamos.datalayer;
 
-import org.quartz.JobKey;
 import org.slf4j.Logger;
 import com.wiled.ubicame.prestamos.entidades.Usuario;
 import com.wiled.ubicame.prestamos.utils.PrestamoException;
@@ -23,10 +22,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.slf4j.LoggerFactory;
-
 
 /**
  *
@@ -36,9 +32,7 @@ public class Controller {
     private EntityManagerFactory emf;
     private EntityManager em;
     private static Controller controller;
-    private Scheduler scheduler;
     private final Logger log;
-    private boolean testing;
     
     private Controller(String persistenceUnit) {
         emf = Persistence.createEntityManagerFactory(persistenceUnit);
@@ -50,7 +44,6 @@ public class Controller {
         emf = Persistence.createEntityManagerFactory(PrestamoConstants.TEST_PU);
         em = emf.createEntityManager();
         log = LoggerFactory.getLogger(Controller.class);     
-        testing = true;
     }
         
     public boolean validateUser(String user, char[] password) {        
@@ -62,10 +55,6 @@ public class Controller {
         
         if(usuario != null) return true;
         return false;                
-    }
-    
-    public Scheduler getScheduler() {
-        return scheduler;
     }
         
     public static Controller getInstance(String persistenceUnit) {
@@ -96,10 +85,6 @@ public class Controller {
         em.merge(obj);
         //em.flush();
         em.getTransaction().commit();
-    }
-    
-    public void eliminarJob(JobKey jk) throws SchedulerException {
-        scheduler.deleteJob(jk);
     }
         
     public void refresh(Object obj) {
@@ -224,7 +209,7 @@ public class Controller {
         return true;
     }
 
-    public void modificarPrestamo(Renegociacion renegociacion) throws SchedulerException {
+    public void modificarPrestamo(Renegociacion renegociacion) {
         //Crear una renegociacion                
         persist(renegociacion);
         

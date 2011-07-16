@@ -10,10 +10,11 @@
     <class>com.wiled.ubicame.prestamos.entidades.Renegociacion</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>
-      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/prestamos"/>
+      <property name="javax.persistence.jdbc.url" value="jdbc:derby:prestamos"/>
       <property name="javax.persistence.jdbc.password" value="wiled"/>
-      <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+      <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
       <property name="javax.persistence.jdbc.user" value="prestamo"/>
+      
     </properties>
   </persistence-unit>
   <persistence-unit name="testPU" transaction-type="RESOURCE_LOCAL">

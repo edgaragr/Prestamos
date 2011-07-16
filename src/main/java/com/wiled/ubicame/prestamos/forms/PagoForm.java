@@ -33,7 +33,6 @@ import javax.print.PrintException;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 import static com.wiled.ubicame.prestamos.utils.PrestamoUtils.*;
-import org.quartz.SchedulerException;
 
 /**
  *
@@ -696,11 +695,8 @@ public class PagoForm extends javax.swing.JDialog {
                 renegociacion.setFecha(fechaTxt.getDate());
                 renegociacion.setNuevaFormaPago((FormaPago) formaPagoCBox.getSelectedItem());
 
-                try {
-                    controller.modificarPrestamo(renegociacion);                    
-                } catch (SchedulerException ex) {
-                    JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "ERROR ELIMINANDO JOB", JOptionPane.ERROR_MESSAGE);
-                }
+                controller.modificarPrestamo(renegociacion);                    
+
             }
             
             activarEstadoRenegociar(false);
