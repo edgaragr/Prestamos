@@ -12,7 +12,6 @@ package com.wiled.ubicame.prestamos.forms;
 
 import javax.persistence.EntityManager;
 import java.util.Map;
-import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -123,7 +122,7 @@ public class Application extends javax.swing.JFrame {
         criterioBusquedaCombo.insertItemAt(CriterioBusqueda.NOMBRE, 2);
         criterioBusquedaCombo.insertItemAt(CriterioBusqueda.APELLIDO, 3);
 
-        criterioBusquedaCombo.setSelectedIndex(0);
+        criterioBusquedaCombo.setSelectedIndex(2);
 
         valorBusquedaTxt.grabFocus();
     }
