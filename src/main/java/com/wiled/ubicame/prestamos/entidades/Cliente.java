@@ -23,8 +23,8 @@ import javax.persistence.TableGenerator;
  */
 @Entity
 @NamedQueries({
-    @NamedQuery(name="Cliente.buscarNombre", query="Select c from Cliente c where c.nombre like :nombre"),
-    @NamedQuery(name="Cliente.buscarApellido", query="Select c from Cliente c where c.apellido like :apellido"),
+    @NamedQuery(name="Cliente.buscarNombre", query="Select c from Cliente c where UPPER(c.nombre) like :nombre"),
+    @NamedQuery(name="Cliente.buscarApellido", query="Select c from Cliente c where UPPER(c.apellido) like :apellido"),
     @NamedQuery(name="Cliente.buscarCedula", query="Select c from Cliente c where c.cedula = :cedula"),
     @NamedQuery(name="Cliente.buscarTelefono", query="Select c from Cliente c where c.telefono = :telefono"),
     @NamedQuery(name="Cliente.getAll", query="Select c from Cliente c")
@@ -45,7 +45,6 @@ public class Cliente implements Serializable {
     public Cliente() {
         prestamos = new ArrayList<Prestamo>();
     }
-
     
     public List<Prestamo> getPrestamos() {
         return prestamos;
