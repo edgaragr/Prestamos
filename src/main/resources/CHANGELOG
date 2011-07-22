@@ -1,0 +1,7 @@
+Version 1.1
+
+
+Version 1.2
+    *   En la ventana de inicio el criterio por defecto para busqueda sera el Nombre de la persona
+    *   Las busquedas son case insensitive
+    *   En la creacion de clientes los unicos campos requeridos son Nombre y Apellido
