@@ -109,14 +109,14 @@ public class Controller {
         
     public List<Cliente> buscarClientePorNombre(String nombre) {
         Query q = em.createNamedQuery("Cliente.buscarNombre");
-        q.setParameter("nombre", nombre);
+        q.setParameter("nombre", nombre.toUpperCase());
         
         return q.getResultList();
     }
     
     public List<Cliente> buscarClientePorApellido(String apellido) {
         Query q = em.createNamedQuery("Cliente.buscarApellido");
-        q.setParameter("apellido", apellido);
+        q.setParameter("apellido", apellido.toUpperCase());
         
         return q.getResultList();
     }
