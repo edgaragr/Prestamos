@@ -10,7 +10,7 @@ package com.wiled.ubicame.prestamos.entidades;
  */
 public enum TipoPago {
 
-    ABONO("ABONO"), PAGO_INTERES("INTERESES");
+    ABONO("ABONO CAPITAL"), PAGO_INTERES("INTERESES");
     String tipoPago;
 
     TipoPago(String tipo) {
