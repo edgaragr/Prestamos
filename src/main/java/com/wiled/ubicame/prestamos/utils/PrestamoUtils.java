@@ -48,6 +48,7 @@ public class PrestamoUtils {
         str = str.replaceAll("-", "");
 
         for (int i = 0; i < str.length(); i++) {
+            if(str.charAt(i) == '.') continue;
             if (!Character.isDigit(str.charAt(i))) {
                 return false;
             }
