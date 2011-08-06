@@ -154,40 +154,43 @@ public class PagoForm extends javax.swing.JDialog {
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_DELETE) {
-                    Pago pago = ((PagosTableModel) pagosTable.getModel()).pagos.get(pagosTable.getSelectedRow());
-                    ((PagosTableModel) pagosTable.getModel()).pagos.remove(pagosTable.getSelectedRow());
-                    pagosTable.updateUI();
+                    int result = JOptionPane.showConfirmDialog(rootPane, "¿Esta seguro que desea eliminar este pago?", "Eliminar Pago", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                    if(result == JOptionPane.YES_OPTION) {
+                        Pago pago = ((PagosTableModel) pagosTable.getModel()).pagos.get(pagosTable.getSelectedRow());
+                        ((PagosTableModel) pagosTable.getModel()).pagos.remove(pagosTable.getSelectedRow());
+                        pagosTable.updateUI();
 
-                    if (pago instanceof Abono) {
-                        prestamo.getAbonos().remove((Abono) pago);
-                        //prestamo.getAbonos().remove();
-                        controller.removeAbono((Abono) pago);
-                        prestamo.setMonto(prestamo.getMonto() + pago.getMonto());
-                        controller.merge(prestamo);
-                    } else if (pago instanceof PagoInteres) {
-                        prestamo.getPagos().remove((PagoInteres) pago);
+                        if (pago instanceof Abono) {
+                            prestamo.getAbonos().remove((Abono) pago);
+                            //prestamo.getAbonos().remove();
+                            controller.removeAbono((Abono) pago);
+                            prestamo.setMonto(prestamo.getMonto() + pago.getMonto());
+                            controller.merge(prestamo);
+                        } else if (pago instanceof PagoInteres) {
+                            prestamo.getPagos().remove((PagoInteres) pago);
 
-                        controller.removePagoInteres((PagoInteres) pago);
-                        controller.merge(prestamo);
-                    }
+                            controller.removePagoInteres((PagoInteres) pago);
+                            controller.merge(prestamo);
+                        }
 
-                    List<Pago> pagos = new ArrayList<Pago>();
-                    pagos.addAll(prestamo.getAbonos());
-                    pagos.addAll(prestamo.getPagos());
+                        List<Pago> pagos = new ArrayList<Pago>();
+                        pagos.addAll(prestamo.getAbonos());
+                        pagos.addAll(prestamo.getPagos());
 
-                    pagosTable.setModel(new PagosTableModel(pagos));
-                    pagosTable.updateUI();
+                        pagosTable.setModel(new PagosTableModel(pagos));
+                        pagosTable.updateUI();
 
-                    montoTxt.setText(String.valueOf(prestamo.getMonto()));
+                        montoTxt.setText(String.valueOf(prestamo.getMonto()));
 
-                    double interesAcumulado = PrestamoUtils.getInteresAcumulado(prestamo);
+                        double interesAcumulado = PrestamoUtils.getInteresAcumulado(prestamo);
 
-                    interesesTxt.setText(String.valueOf(PrestamoUtils.redondear(interesAcumulado, 2)));
+                        interesesTxt.setText(String.valueOf(PrestamoUtils.redondear(interesAcumulado, 2)));
 
-                    double totalAbonado = Controller.getTotalAbonado(prestamo.getAbonos());
-                    abonadoTxt.setText(String.valueOf(totalAbonado));
+                        double totalAbonado = Controller.getTotalAbonado(prestamo.getAbonos());
+                        abonadoTxt.setText(String.valueOf(totalAbonado));
 
-                    JOptionPane.showMessageDialog(rootPane, "Pago eliminado exitosamente", "Eliminacion de Pago", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(rootPane, "Pago eliminado exitosamente", "Eliminacion de Pago", JOptionPane.INFORMATION_MESSAGE);
+                    }                                        
                 }
             }
         });
