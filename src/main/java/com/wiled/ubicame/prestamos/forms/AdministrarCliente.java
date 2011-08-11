@@ -169,11 +169,14 @@ public class AdministrarCliente extends javax.swing.JDialog {
 
     private void eliminarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarBtnActionPerformed
         try {
-            controller.remove(cliente);
-            JOptionPane.showMessageDialog(rootPane, "Cliente eliminado exitosamente", "ELIMINANACION DE CLIENTE", JOptionPane.INFORMATION_MESSAGE);
-            
-            clienteEliminado = true;
-            dispose();
+            int resultado = JOptionPane.showConfirmDialog(rootPane, "¿Esta seguro que desea eliminar este cliente?", "CONFIRMACION", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if(resultado == JOptionPane.YES_OPTION) {
+                controller.remove(cliente);
+                JOptionPane.showMessageDialog(rootPane, "Cliente eliminado exitosamente", "ELIMINANACION DE CLIENTE", JOptionPane.INFORMATION_MESSAGE);
+
+                clienteEliminado = true;
+                dispose();
+            }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "ERROR ELIMINANDO CLIENTE", JOptionPane.ERROR_MESSAGE);
         }
