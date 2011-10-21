@@ -148,12 +148,16 @@ public class Application extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         amortizarPrestamo = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
+        ingresosPorDiaMenu = new javax.swing.JMenuItem();
+        ingresoRangoFechaMenu = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem4 = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
         backupMenu = new javax.swing.JMenuItem();
         menuSalir = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Sistema de Presamos");
+        setTitle("Sistema de Prestamos");
         setResizable(false);
 
         jLabel1.setText("Criterio de Busqueda:");
@@ -206,6 +210,29 @@ public class Application extends javax.swing.JFrame {
         jMenuBar1.add(jMenu3);
 
         jMenu5.setText("Reportes");
+
+        ingresosPorDiaMenu.setText("Ingreso por Dia");
+        ingresosPorDiaMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ingresosPorDiaMenuActionPerformed(evt);
+            }
+        });
+        jMenu5.add(ingresosPorDiaMenu);
+
+        ingresoRangoFechaMenu.setText("Ingreso Rango Fecha");
+        ingresoRangoFechaMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ingresoRangoFechaMenuActionPerformed(evt);
+            }
+        });
+        jMenu5.add(ingresoRangoFechaMenu);
+
+        jMenuItem3.setText("Historial de Cliente");
+        jMenu5.add(jMenuItem3);
+
+        jMenuItem4.setText("Monto Total Prestado");
+        jMenu5.add(jMenuItem4);
+
         jMenuBar1.add(jMenu5);
 
         jMenu1.setText("Operaciones");
@@ -238,7 +265,7 @@ public class Application extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 720, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 745, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -260,7 +287,7 @@ public class Application extends javax.swing.JFrame {
                     .addComponent(buscarBtn))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 428, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -351,6 +378,18 @@ public class Application extends javax.swing.JFrame {
 
         }
     }//GEN-LAST:event_crearClienteMenuActionPerformed
+
+    private void ingresosPorDiaMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ingresosPorDiaMenuActionPerformed
+        IngresosPorDiaForm form = new IngresosPorDiaForm(this, true);
+        form.setLocationRelativeTo(null);
+        form.setVisible(true);
+    }//GEN-LAST:event_ingresosPorDiaMenuActionPerformed
+
+    private void ingresoRangoFechaMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ingresoRangoFechaMenuActionPerformed
+        IngresosRangoFecha form = new IngresosRangoFecha(this, true);
+        form.setLocationRelativeTo(null);
+        form.setVisible(true);
+    }//GEN-LAST:event_ingresoRangoFechaMenuActionPerformed
 
     /**
      * @param args the command line arguments
@@ -523,11 +562,15 @@ public class Application extends javax.swing.JFrame {
     private javax.swing.JButton buscarBtn;
     private javax.swing.JMenuItem crearClienteMenu;
     private javax.swing.JComboBox criterioBusquedaCombo;
+    private javax.swing.JMenuItem ingresoRangoFechaMenu;
+    private javax.swing.JMenuItem ingresosPorDiaMenu;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JMenu menuClientes;
     private javax.swing.JMenuItem menuSalir;
