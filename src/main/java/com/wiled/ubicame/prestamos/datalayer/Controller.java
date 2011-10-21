@@ -15,6 +15,7 @@ import com.wiled.ubicame.prestamos.entidades.Prestamo;
 import com.wiled.ubicame.prestamos.entidades.Renegociacion;
 import com.wiled.ubicame.prestamos.utils.PrestamoConstants;
 import com.wiled.ubicame.prestamos.utils.PrestamoUtils;
+import java.sql.Connection;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +34,7 @@ public class Controller {
     private EntityManager em;
     private static Controller controller;
     private final Logger log;
+    private Connection connection;
     
     private Controller(String persistenceUnit) {
         emf = Persistence.createEntityManagerFactory(persistenceUnit);
@@ -46,6 +48,15 @@ public class Controller {
         log = LoggerFactory.getLogger(Controller.class);     
     }
         
+    public Connection getJDBCConnection() {
+        if(connection == null) {            
+            em.getTransaction().begin();
+            connection = em.unwrap(java.sql.Connection.class);
+        }
+
+        return connection;
+    }
+    
     public boolean validateUser(String user, char[] password) {        
         Query q = em.createNamedQuery("Usuario.buscarUsuario");
         q.setParameter("usuario", user);
