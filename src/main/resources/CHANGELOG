@@ -9,3 +9,8 @@ Version 1.2
 Version 1.3
     *   Se permiten tasas decimales
     *   Se agrego dialogo de confirmacion al tratar de eliminar un pago
+
+Version 1.4
+    *   Se agregaron dos nuevos reportes:
+        - Reportes Entrada por Dia
+        - Reportes Entrada por rango de fechas
