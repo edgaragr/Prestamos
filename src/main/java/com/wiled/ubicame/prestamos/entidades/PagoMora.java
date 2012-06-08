@@ -4,15 +4,11 @@
  */
 package com.wiled.ubicame.prestamos.entidades;
 
-import java.util.Date;
-
 /**
  *
- * @author Edgar Garcia
+ * @author Raymer
  */
-public interface Pago {
-    public Date getFecha();
+public interface PagoMora {
     
-    public double getMonto();
-    public String getTipoPago();
+    public double getMora();
 }

@@ -248,7 +248,7 @@ public class PagoForm extends javax.swing.JDialog {
                     value = pagos.get(rowIndex).getMonto();
                     break;
                 case 2:
-                    value = pagos.get(rowIndex).getMora();
+//                    value = pagos.get(rowIndex).getMora();
                     break;
                 case 3:
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");

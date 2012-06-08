@@ -19,7 +19,7 @@ import javax.persistence.Temporal;
  * @author edgar
  */
 @Entity
-public class PagoInteres implements Serializable, Pago {
+public class PagoInteres implements Serializable, Pago, PagoMora {
     private static final long serialVersionUID = 1L;
     @Id
 @GeneratedValue(strategy = GenerationType.TABLE, generator = "Prestamo")
