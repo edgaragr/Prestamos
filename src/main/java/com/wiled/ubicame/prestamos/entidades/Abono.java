@@ -90,10 +90,7 @@ public class Abono implements Serializable, Pago {
         return "com.wiled.ubicame.prestamos.entidades.Abono[ id=" + id + " ]";
     }
 
-    @Override
-    public double getMora() {
-        return 0;
-    }
+ 
 
     @Override
     public String getTipoPago() {
