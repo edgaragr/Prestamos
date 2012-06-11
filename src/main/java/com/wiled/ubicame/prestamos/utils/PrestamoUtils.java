@@ -35,9 +35,7 @@ import javax.print.SimpleDoc;
  */
 public class PrestamoUtils {
 
-    public static float amortizarPrestamo(double monto, float tasa) {
-        return (float) ((monto*tasa)/100);
-    }
+
 
     public static boolean containsOnlyNumbers(String str) {
         if (str == null || str.length() == 0) {
