@@ -40,7 +40,7 @@ public class PagoInteres implements Serializable, Pago {
         this.prestamo = prestamo;
     }
         
-    @Override
+   
     public double getMora() {
         return mora;
     }
