@@ -287,30 +287,32 @@ public class Application extends javax.swing.JFrame {
         } else {
             List<Cliente> listaClientes = null;
 
+            
             switch (criterioBusqueda) {
                 case APELLIDO:
-                    listaClientes = controller.buscarClientePorApellido("%" + valorDeBusqueda + "%");
+                    listaClientes = new BuscarClientePorApellido(controller.getEm()).buscarCliente("%" + valorDeBusqueda + "%");
                     break;
                 case CEDULA:
                     if (containsOnlyNumbers(valorDeBusqueda) && isCedulaSizeValid(valorDeBusqueda)) {
-                        listaClientes = controller.buscarClientePorCedula(valorDeBusqueda);
+                        listaClientes = new BuscarClientePorCedula(controller.getEm()).buscarCliente( valorDeBusqueda);
                     } else {
                         JOptionPane.showMessageDialog(this, "Introduzca un numero de cedula valido", "ERROR", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     break;
                 case NOMBRE:
-                    listaClientes = controller.buscarClientePorNombre("%" + valorDeBusqueda + "%");
-                    break;
+                    listaClientes = new BuscarClientePorNombre(controller.getEm()).buscarCliente("%" + valorDeBusqueda + "%");
+                     break;
                 case TELEFONO:
                     if (containsOnlyNumbers(valorDeBusqueda) && isTelefonoSizeValid(valorDeBusqueda)) {
-                        listaClientes = controller.buscarClientePorTelefono(valorDeBusqueda);
+                        listaClientes = new BuscarClientePorTelefono(controller.getEm()).buscarCliente( valorDeBusqueda);
                     } else {
                         JOptionPane.showMessageDialog(this, "Introduzca un numero de telefono valido", "ERROR", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    listaClientes = controller.buscarClientePorTelefono(valorDeBusqueda);
+                    listaClientes = new BuscarClientePorTelefono(controller.getEm()).buscarCliente( valorDeBusqueda);;
                     break;
+
                 default:
                     listaClientes = new ArrayList<Cliente>();
             }

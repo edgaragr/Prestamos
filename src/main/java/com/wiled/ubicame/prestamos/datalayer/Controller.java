@@ -72,6 +72,14 @@ public class Controller {
         
         return controller;
     }
+	
+	 public EntityManager getEm() {
+		return em;
+	}
+
+	public void setEm(EntityManager em) {
+		this.em = em;
+	}
         
     public void persist(Object obj) {
         em.getTransaction().begin();
@@ -107,33 +115,6 @@ public class Controller {
         em.remove(i);
     }
         
-    public List<Cliente> buscarClientePorNombre(String nombre) {
-        Query q = em.createNamedQuery("Cliente.buscarNombre");
-        q.setParameter("nombre", nombre.toUpperCase());
-        
-        return q.getResultList();
-    }
-    
-    public List<Cliente> buscarClientePorApellido(String apellido) {
-        Query q = em.createNamedQuery("Cliente.buscarApellido");
-        q.setParameter("apellido", apellido.toUpperCase());
-        
-        return q.getResultList();
-    }
-    
-    public List<Cliente> buscarClientePorCedula(String cedula) {
-        Query q = em.createNamedQuery("Cliente.buscarCedula");
-        q.setParameter("cedula", cedula);
-        
-        return q.getResultList();
-    }
-    
-    public List<Cliente> buscarClientePorTelefono(String telefono) {
-        Query q = em.createNamedQuery("Cliente.buscarTelefono");
-        q.setParameter("telefono", telefono);
-        
-        return q.getResultList();
-    }
     
     public boolean aplicarPagoIntereses(Prestamo prestamo, Date fecha, final double monto, final double mora)  throws PrestamoException {
         if ((monto < 0) || (mora < 0)) throw new PrestamoException("Valor del 'monto' o la 'mora' es menor que cero (0)") ;
@@ -233,12 +214,6 @@ public class Controller {
         }
         
         return totalAbonado;
-    }
-    
-    public double amortizarPrestamo(final Double monto, final float tasa)  throws PrestamoException {     
-        if(monto < 0) throw new PrestamoException("Valor del 'monto' es menor que cero (0)");
-        
-        return (monto * tasa)/100;
     }
     
     public Cliente crearCliente(String nombre, String apellido, String cedula, String telefono) {
