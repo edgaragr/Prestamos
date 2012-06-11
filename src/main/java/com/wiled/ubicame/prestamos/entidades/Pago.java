@@ -12,7 +12,6 @@ import java.util.Date;
  */
 public interface Pago {
     public Date getFecha();
-    public double getMora();
     public double getMonto();
     public String getTipoPago();
 }

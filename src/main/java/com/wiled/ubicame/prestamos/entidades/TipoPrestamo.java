@@ -10,4 +10,18 @@ package com.wiled.ubicame.prestamos.entidades;
  */
 public enum TipoPrestamo {
     INTERES_CAPITAL, USURA;
+  String tipoPrestamo;
+
+    TipoPrestamo(String tipo) {
+        tipoPago = tipo;
+    }
+
+    public String getTipoPrestamo() {
+        return TipoPrestamo;
+    }
+
+    @Override
+    public String toString() {
+        return tipoPrestamo;
+    }        
 }

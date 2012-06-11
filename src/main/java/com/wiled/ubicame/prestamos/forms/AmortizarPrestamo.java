@@ -134,10 +134,11 @@ public class AmortizarPrestamo extends javax.swing.JDialog {
             return;
         }
         
+        
         double monto = Double.valueOf(montoTxt.getText());
         float tasa = Float.valueOf(tasaTxt.getText());
         try {
-            double resultado = controller.amortizarPrestamo(monto, tasa);
+            float resultado = PrestamosUtils.amortizarPrestamo(monto, tasa);
             JOptionPane.showMessageDialog(rootPane, "Cuotas de: RD$" + resultado + " pesos..", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
             
             montoTxt.setBackground(Color.WHITE);
