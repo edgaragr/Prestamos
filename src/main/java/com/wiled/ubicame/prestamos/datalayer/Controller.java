@@ -107,32 +107,10 @@ public class Controller {
         em.remove(i);
     }
         
-    public List<Cliente> buscarClientePorNombre(String nombre) {
-        Query q = em.createNamedQuery("Cliente.buscarNombre");
-        q.setParameter("nombre", nombre.toUpperCase());
-        
-        return q.getResultList();
-    }
-    
-    public List<Cliente> buscarClientePorApellido(String apellido) {
-        Query q = em.createNamedQuery("Cliente.buscarApellido");
-        q.setParameter("apellido", apellido.toUpperCase());
-        
-        return q.getResultList();
-    }
-    
-    public List<Cliente> buscarClientePorCedula(String cedula) {
-        Query q = em.createNamedQuery("Cliente.buscarCedula");
-        q.setParameter("cedula", cedula);
-        
-        return q.getResultList();
-    }
-    
-    public List<Cliente> buscarClientePorTelefono(String telefono) {
-        Query q = em.createNamedQuery("Cliente.buscarTelefono");
-        q.setParameter("telefono", telefono);
-        
-        return q.getResultList();
+     public List<Cliente> buscarCliente(String buscado, String  modo) {
+        Buscardor b = new Buscardor();
+        b.setModo(modo)
+        return  b.buscar(buscado);
     }
     
     public boolean aplicarPagoIntereses(Prestamo prestamo, Date fecha, final double monto, final double mora)  throws PrestamoException {
