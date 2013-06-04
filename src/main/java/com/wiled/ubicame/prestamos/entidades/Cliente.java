@@ -6,9 +6,12 @@ package com.wiled.ubicame.prestamos.entidades;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,6 +19,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.TableGenerator;
+import javax.persistence.Temporal;
 
 /**
  *
@@ -41,7 +45,38 @@ public class Cliente implements Serializable {
     private String telefono;
     @OneToMany(mappedBy = "cliente", cascade= CascadeType.ALL)
     private List<Prestamo> prestamos;
-
+    @Enumerated(EnumType.STRING)
+    private Sexo sexo;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date fechaNacimiento;
+    private String nacionalidad;
+    @Enumerated(EnumType.STRING)
+    private EstadoCivil estadoCivil;
+    private int numeroDependientes;
+    private String ocupacion;
+    private String celular;
+    private String email;
+    private String direccion;
+    private String ciudad;
+    @Enumerated(EnumType.STRING)
+    private TipoResidencia tipoResidencia;
+    private double mensualidad;
+    private String contactoArrendador;
+    private String empresa;
+    private String telEmpresa;
+    private String faxEmpresa;
+    private String dirEmpresa;
+    private String emailEmpresa;
+    private int tiempoEmpresa;
+    private double salario;
+    private double otrosIngresos;
+    private String descSalarioExtra;
+    private String conyugue;
+    private String cedulaConyugue;
+    private String trabajoConyugue;
+    private String tiempoTrabajoConyugue;
+    private String ingresosConyugue;
+    
     public Cliente() {
         prestamos = new ArrayList<Prestamo>();
     }
